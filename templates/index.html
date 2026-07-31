@@ -13,8 +13,29 @@
 <div class="grid">
 <label>Durée de la séance<select id="service" name="service_id" required><option value="">Choisir</option>
 {% for sid,s in services.items() %}<option value="{{sid}}">{{s.name}} — {{s.price}} € — acompte {{s.deposit}} €</option>{% endfor %}</select></label>
-<label>Date<input id="date" name="date" type="date" required></label>
+<label>Date</label>
+
+<div class="booking-calendar">
+  <div class="calendar-header">
+    <button type="button" id="prevMonth">‹</button>
+    <strong id="calendarTitle"></strong>
+    <button type="button" id="nextMonth">›</button>
+  </div>
+
+  <div class="calendar-weekdays">
+    <span>Lun.</span>
+    <span>Mar.</span>
+    <span>Mer.</span>
+    <span>Jeu.</span>
+    <span>Ven.</span>
+    <span>Sam.</span>
+    <span>Dim.</span>
+  </div>
+
+  <div id="calendarDays" class="calendar-days"></div>
 </div>
+
+<input id="date" name="date" type="hidden" required>
 <label>Heure<div id="times" class="times"><span class="muted">Choisis d’abord une durée et une date.</span></div><input id="time" name="time" type="hidden" required></label>
 <div class="grid"><label>Pseudo<input name="pseudo" required></label><label>Âge<input name="age" type="number" min="18" required></label></div>
 <div class="grid"><label>E-mail<input name="email" type="email" required></label><label>X / Twitter (optionnel)<input name="twitter" placeholder="@pseudo"></label></div>
@@ -25,7 +46,79 @@
 </form>
 <p class="muted">Pour une séance de plus de 2 heures : <a href="mailto:maitresselanaftt@gmail.com">maitresselanaftt@gmail.com</a></p>
 </div></section>
-<script>
+<script> const calendarDays = document.getElementById('calendarDays');
+const calendarTitle = document.getElementById('calendarTitle');
+const prevMonth = document.getElementById('prevMonth');
+const nextMonth = document.getElementById('nextMonth');
+
+let currentMonth = new Date();
+currentMonth.setDate(1);
+
+function renderCalendar() {
+  calendarDays.innerHTML = '';
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+
+  calendarTitle.textContent = currentMonth.toLocaleDateString('fr-FR', {
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  let start = firstDay.getDay();
+  start = start === 0 ? 6 : start - 1;
+
+  for (let i = 0; i < start; i++) {
+    const empty = document.createElement('span');
+    calendarDays.appendChild(empty);
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = day;
+
+    const d = new Date(year, month, day);
+    const minimum = new Date();
+    minimum.setHours(0, 0, 0, 0);
+    minimum.setDate(minimum.getDate() + 1);
+
+    if (d < minimum) {
+      button.disabled = true;
+    } else {
+      button.onclick = () => {
+        document.querySelectorAll('.calendar-days button')
+          .forEach(b => b.classList.remove('selected'));
+
+        button.classList.add('selected');
+
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+
+        date.value = `${y}-${m}-${dd}`;
+        refresh();
+      };
+    }
+
+    calendarDays.appendChild(button);
+  }
+}
+
+prevMonth.onclick = () => {
+  currentMonth.setMonth(currentMonth.getMonth() - 1);
+  renderCalendar();
+};
+
+nextMonth.onclick = () => {
+  currentMonth.setMonth(currentMonth.getMonth() + 1);
+  renderCalendar();
+};
+
+renderCalendar();
 const service=document.getElementById('service'), date=document.getElementById('date'), times=document.getElementById('times'), time=document.getElementById('time');
 const min=new Date(Date.now()+24*60*60*1000); date.min=min.toISOString().slice(0,10);
 async function refresh(){
@@ -35,7 +128,7 @@ async function refresh(){
   const slots=await r.json(); times.innerHTML='';
   if(!slots.length){times.innerHTML='<span class="muted">Aucun créneau disponible ce jour.</span>';return;}
   slots.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='timebtn';b.textContent=s;b.onclick=()=>{document.querySelectorAll('.timebtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');time.value=s};times.appendChild(b);});
-}
+} la
 service.onchange=refresh; date.onchange=refresh;
 document.getElementById('bookingForm').onsubmit=(e)=>{if(!time.value){e.preventDefault();alert('Choisis une heure.');}};
 </script><script src="{{ url_for('static', filename='script.js') }}"></script></body></html>
