@@ -1,0 +1,119 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff8f5;
+  color: #2b211e;
+}
+
+header {
+  background: #2b211e;
+  color: white;
+  padding: 18px 20px;
+}
+
+.brand {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.wrap {
+  width: min(1100px, 92%);
+  margin: 35px auto;
+}
+
+h1, h2 {
+  margin-top: 0;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.gallery img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.btn {
+  display: inline-block;
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 20px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary {
+  background: #2b211e;
+  color: white;
+}
+
+.secondary {
+  background: #ead8cf;
+  color: #2b211e;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin: 15px 0 6px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d8ccc6;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.muted {
+  color: #766963;
+  font-size: 14px;
+}
+
+.summary {
+  background: #fff4ee;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 18px 0;
+}
+
+@media (max-width: 700px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery img {
+    height: 320px;
+  }
+
+  .wrap {
+    width: 94%;
+    margin: 20px auto;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
