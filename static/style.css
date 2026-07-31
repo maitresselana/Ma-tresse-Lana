@@ -554,8 +554,8 @@ header h1,
 .hero-photo-card::after{
   content:"";
   position:absolute;
-  width:105px;
-  height:105px;
+  width:115px;
+  height:115px;
   background:url("/static/rose.PNG") center/contain no-repeat;
   z-index:5;
   pointer-events:none;
