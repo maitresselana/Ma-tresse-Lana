@@ -573,3 +573,33 @@ header h1,
   bottom:-28px;
   transform:rotate(160deg);
 }
+.hero-text-card{
+  margin-top:-18px;
+  background:
+    radial-gradient(circle at top, rgba(110,20,40,.18), transparent 40%),
+    linear-gradient(180deg,#2a0710 0%, #14080d 100%);
+  border:1px solid rgba(201,170,106,.22);
+  box-shadow:0 20px 55px rgba(0,0,0,.45);
+}
+
+.hero-text-card::before{
+  content:"♛";
+  display:block;
+  width:max-content;
+  margin:0 auto 12px;
+  padding:0 42px;
+  color:#d8b477;
+  font-size:24px;
+  background:
+    linear-gradient(#d8b477,#d8b477) left center/32px 1px no-repeat,
+    linear-gradient(#d8b477,#d8b477) right center/32px 1px no-repeat;
+}
+
+.hero-text-card h1{
+  font-size:54px;
+  letter-spacing:-1px;
+}
+
+.btn-gold{
+  min-width:260px;
+}
