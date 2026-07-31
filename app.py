@@ -267,7 +267,7 @@ Acompte : {service['deposit']} €
 Après paiement, le rendez-vous reste soumis à confirmation personnelle par Maîtresse Lana.
 L’adresse exacte n’est pas publiée sur le site et sera communiquée après confirmation.
 
-Acompte non remboursable. Déplacement possible si la demande est faite au moins 48 h à l’avance.
+Acompte non remboursable. Toute modification du rendez-vous doit être demandée au moins 48 h à l’avance.
 Au-delà de 15 minutes de retard, le rendez-vous est annulé.
 """
     send_email(email, f"Demande de réservation #{booking_id}", client_body)
