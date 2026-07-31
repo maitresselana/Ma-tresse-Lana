@@ -54,7 +54,7 @@ const nextMonth = document.getElementById('nextMonth');
 let currentMonth = new Date();
 currentMonth.setDate(1);
 
-function renderCalendar() {
+async function renderCalendar() {
   calendarDays.innerHTML = '';
 
   const year = currentMonth.getFullYear();
@@ -64,6 +64,21 @@ function renderCalendar() {
     month: 'long',
     year: 'numeric'
   });
+
+  let availability = {};
+
+  if (service.value) {
+    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+    try {
+      const r = await fetch(
+        `/api/month-availability?month=${monthKey}&service_id=${encodeURIComponent(service.value)}`
+      );
+      availability = await r.json();
+    } catch (e) {
+      availability = {};
+    }
+  }
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -82,24 +97,38 @@ function renderCalendar() {
     button.textContent = day;
 
     const d = new Date(year, month, day);
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const dateKey = `${y}-${m}-${dd}`;
+
     const minimum = new Date();
     minimum.setHours(0, 0, 0, 0);
     minimum.setDate(minimum.getDate() + 1);
 
     if (d < minimum) {
       button.disabled = true;
+      button.classList.add('unavailable');
+
+    } else if (service.value && availability[dateKey] === 0) {
+      button.disabled = true;
+      button.classList.add('full');
+      button.title = 'Complet';
+
     } else {
+      if (service.value && availability[dateKey] > 0) {
+        button.classList.add('available');
+        button.title = `${availability[dateKey]} créneau(x) disponible(s)`;
+      }
+
       button.onclick = () => {
         document.querySelectorAll('.calendar-days button')
           .forEach(b => b.classList.remove('selected'));
 
         button.classList.add('selected');
 
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-
-        date.value = `${y}-${m}-${dd}`;
+        date.value = dateKey;
         refresh();
       };
     }
@@ -129,6 +158,11 @@ async function refresh(){
   if(!slots.length){times.innerHTML='<span class="muted">Aucun créneau disponible ce jour.</span>';return;}
   slots.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='timebtn';b.textContent=s;b.onclick=()=>{document.querySelectorAll('.timebtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');time.value=s};times.appendChild(b);});
 } 
-service.onchange=refresh; date.onchange=refresh;
+service.onchange=()=>{
+  date.value='';
+  time.value='';
+  times.innerHTML='<span class="muted">Choisis une date.</span>';
+  renderCalendar();
+}; date.onchange=refresh;
 document.getElementById('bookingForm').onsubmit=(e)=>{if(!time.value){e.preventDefault();alert('Choisis une heure.');}};
 </script><script src="{{ url_for('static', filename='script.js') }}"></script></body></html>
