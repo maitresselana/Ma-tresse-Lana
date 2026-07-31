@@ -603,3 +603,11 @@ header h1,
 .btn-gold{
   min-width:260px;
 }
+.hero-text-card{
+  margin-top:-30px;
+}
+
+.hero-photo-card::before,
+.hero-photo-card::after{
+  opacity:.78;
+}
