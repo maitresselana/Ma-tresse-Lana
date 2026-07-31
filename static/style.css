@@ -392,3 +392,30 @@ header h1,
   border:1px solid rgba(201,170,106,.45);
   box-shadow:0 18px 45px rgba(0,0,0,.45);
 }
+.hero{
+  position:relative;
+}
+
+.hero::before,
+.hero::after{
+  position:absolute;
+  z-index:2;
+  font-size:52px;
+  opacity:.72;
+  filter:saturate(.65) brightness(.75);
+  pointer-events:none;
+}
+
+.hero::before{
+  content:"🥀";
+  top:10px;
+  left:10px;
+  transform:rotate(-20deg);
+}
+
+.hero::after{
+  content:"🥀";
+  bottom:10px;
+  right:10px;
+  transform:rotate(160deg);
+}
