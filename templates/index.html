@@ -3,10 +3,27 @@
 <title>Maîtresse Lana — Réservation</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
 <body><header><div class="brand">MAÎTRESSE LANA</div><a class="btn secondary" href="#reservation">Réserver</a></header>
 {% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
-<section class="hero"><div><div class="muted">MEaux (77) · 18+ · SUR RENDEZ-VOUS</div><h1>Réserve ton <span>créneau.</span></h1>
-<p>Choisis la durée, la date et l’heure. L’acompte bloque temporairement le créneau, puis Maîtresse Lana confirme personnellement le rendez-vous par e-mail.</p>
-<a class="btn primary" href="#reservation">Voir les disponibilités</a></div>
-<img src="{{ url_for('static', filename='lana1.PNG') }}" alt="Maîtresse Lana"></section>
+<section class="hero hero-lana">
+
+  <div class="hero-photo-card">
+    <img src="{{ url_for('static', filename='lana1.PNG') }}" alt="Maîtresse Lana">
+  </div>
+
+  <div class="hero-text-card">
+    <h1>Réserve ton <span>créneau.</span></h1>
+
+    <p>
+      Choisis la durée, la date et l’heure.<br>
+      L’acompte bloque temporairement ton créneau,<br>
+      puis je confirme personnellement ton rendez-vous.
+    </p>
+
+    <a class="btn btn-gold" href="#reservation">
+      Voir les disponibilités
+    </a>
+  </div>
+
+</section>
 
 <section class="wrap" id="reservation"><div class="card"><h2>Réservation</h2>
 <form method="post" action="{{ url_for('book') }}" id="bookingForm">
