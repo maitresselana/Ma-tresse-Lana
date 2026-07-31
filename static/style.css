@@ -545,3 +545,31 @@ header h1,
     width:100%;
   }
 }
+.hero-photo-card{
+  position:relative;
+  overflow:visible;
+}
+
+.hero-photo-card::before,
+.hero-photo-card::after{
+  content:"";
+  position:absolute;
+  width:105px;
+  height:105px;
+  background:url("/static/rose.PNG") center/contain no-repeat;
+  z-index:5;
+  pointer-events:none;
+  opacity:.85;
+}
+
+.hero-photo-card::before{
+  top:-28px;
+  left:-22px;
+  transform:rotate(-18deg);
+}
+
+.hero-photo-card::after{
+  right:-22px;
+  bottom:-28px;
+  transform:rotate(160deg);
+}
