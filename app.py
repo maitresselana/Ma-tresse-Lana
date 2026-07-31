@@ -332,7 +332,7 @@ Durée : {b['duration_minutes']} minutes
 Lieu : Meaux (77)
 
 L’adresse exacte te sera communiquée séparément.
-Déplacement possible uniquement avec au moins 48 h de préavis.
+Toute modification du rendez-vous doit être demandée au moins 48 h à l’avance.
 Au-delà de 15 minutes de retard, le rendez-vous est annulé.
 """
         send_email(b["email"], f"Rendez-vous confirmé #{b['id']}", body)
