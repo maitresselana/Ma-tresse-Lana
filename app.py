@@ -138,7 +138,52 @@ def availability():
             result.append(cur.strftime("%H:%M"))
         cur += timedelta(minutes=30)
     return jsonify(result)
+@app.get("/api/month-availability")
+def month_availability():
+    month_s = request.args.get("month", "")
+    service_id = request.args.get("service_id", "")
 
+    if service_id not in SERVICES:
+        return jsonify({})
+
+    try:
+        year, month = map(int, month_s.split("-"))
+    except ValueError:
+        return jsonify({})
+
+    duration = SERVICES[service_id]["minutes"]
+
+    if month == 12:
+        next_month = datetime(year + 1, 1, 1)
+    else:
+        next_month = datetime(year, month + 1, 1)
+
+    day = datetime(year, month, 1).date()
+    last_day = (next_month - timedelta(days=1)).date()
+
+    result = {}
+
+    while day <= last_day:
+        cur = datetime.combine(day, datetime.min.time()).replace(hour=17)
+        close = datetime.combine(day + timedelta(days=1), datetime.min.time())
+
+        available = 0
+
+        while cur + timedelta(minutes=duration) <= close:
+            end = cur + timedelta(minutes=duration)
+
+            if (
+                cur >= datetime.now() + timedelta(hours=24)
+                and not booking_conflict(cur, end)
+            ):
+                available += 1
+
+            cur += timedelta(minutes=30)
+
+        result[day.isoformat()] = available
+        day += timedelta(days=1)
+
+    return jsonify(result)
 @app.post("/book")
 def book():
     service_id = request.form.get("service_id","")
