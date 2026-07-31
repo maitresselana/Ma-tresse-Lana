@@ -7,11 +7,7 @@
 <p>Choisis la durée, la date et l’heure. L’acompte bloque temporairement le créneau, puis Maîtresse Lana confirme personnellement le rendez-vous par e-mail.</p>
 <a class="btn primary" href="#reservation">Voir les disponibilités</a></div>
 <img src="{{ url_for('static', filename='lana1.PNG') }}" alt="Maîtresse Lana"></section>
-<section class="wrap">
-  <div class="gallery">
-    <img src="{{ url_for('static', filename='lana1.PNG') }}" alt="Maîtresse Lana">
-  </div>
-</section>
+
 <section class="wrap" id="reservation"><div class="card"><h2>Réservation</h2>
 <form method="post" action="{{ url_for('book') }}" id="bookingForm">
 <div class="grid">
