@@ -309,3 +309,67 @@ th,td{
     border-radius:20px;
   }
 }
+.booking-calendar {
+  margin-top: 14px;
+  padding: 18px;
+  background: #0d0d10;
+  border: 1px solid #4a2633;
+  border-radius: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calendar-header strong {
+  font-size: 20px;
+  text-transform: capitalize;
+  color: #f4e7cf;
+}
+
+.calendar-header button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #6e3448;
+  background: #171218;
+  color: #d8b477;
+  font-size: 25px;
+}
+
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+  text-align: center;
+}
+
+.calendar-weekdays {
+  margin-bottom: 10px;
+  color: #9e9297;
+  font-size: 12px;
+}
+
+.calendar-days button {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #f5f1f2;
+  font-size: 15px;
+}
+
+.calendar-days button.selected {
+  background: #721f3d;
+  border-color: #d8b477;
+  color: white;
+}
+
+.calendar-days button:disabled {
+  color: #494449;
+  opacity: .55;
+}
