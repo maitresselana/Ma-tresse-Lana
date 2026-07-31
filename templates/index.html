@@ -38,4 +38,4 @@ async function refresh(){
 }
 service.onchange=refresh; date.onchange=refresh;
 document.getElementById('bookingForm').onsubmit=(e)=>{if(!time.value){e.preventDefault();alert('Choisis une heure.');}};
-</script></body></html>
+</script><script src="{{ url_for('static', filename='script.js') }}"></script></body></html>
