@@ -1,0 +1,4 @@
+
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head><body>
+<section class="wrap"><div class="card"><h2>Espace privé</h2>{% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
+<form method="post"><label>Mot de passe<input type="password" name="password" required></label><p><button class="btn primary">Connexion</button></p></form></div></section></body></html>

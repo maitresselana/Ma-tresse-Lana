@@ -1,0 +1,41 @@
+
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maîtresse Lana — Réservation</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><div class="brand">MAÎTRESSE LANA</div><a class="btn secondary" href="#reservation">Réserver</a></header>
+{% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
+<section class="hero"><div><div class="muted">MEaux (77) · 18+ · SUR RENDEZ-VOUS</div><h1>Réserve ton <span>créneau.</span></h1>
+<p>Choisis la durée, la date et l’heure. L’acompte bloque temporairement le créneau, puis Maîtresse Lana confirme personnellement le rendez-vous par e-mail.</p>
+<a class="btn primary" href="#reservation">Voir les disponibilités</a></div>
+<img src="{{ url_for('static', filename='lana1.jpeg') }}" alt="Maîtresse Lana"></section>
+<section class="wrap"><div class="gallery"><img src="{{ url_for('static', filename='lana1.jpeg') }}"><img src="{{ url_for('static', filename='lana2.jpeg') }}"><img src="{{ url_for('static', filename='lana3.jpeg') }}"></div></section>
+<section class="wrap" id="reservation"><div class="card"><h2>Réservation</h2>
+<form method="post" action="{{ url_for('book') }}" id="bookingForm">
+<div class="grid">
+<label>Durée de la séance<select id="service" name="service_id" required><option value="">Choisir</option>
+{% for sid,s in services.items() %}<option value="{{sid}}">{{s.name}} — {{s.price}} € — acompte {{s.deposit}} €</option>{% endfor %}</select></label>
+<label>Date<input id="date" name="date" type="date" required></label>
+</div>
+<label>Heure<div id="times" class="times"><span class="muted">Choisis d’abord une durée et une date.</span></div><input id="time" name="time" type="hidden" required></label>
+<div class="grid"><label>Pseudo<input name="pseudo" required></label><label>Âge<input name="age" type="number" min="18" required></label></div>
+<div class="grid"><label>E-mail<input name="email" type="email" required></label><label>X / Twitter (optionnel)<input name="twitter" placeholder="@pseudo"></label></div>
+<label>Message (optionnel)<textarea name="message" rows="4"></textarea></label>
+<label>Moyen de paiement<select name="payment_method"><option value="paypal">PayPal</option><option value="throne">Throne</option></select></label>
+<div class="summary muted">Réservation minimum 24 h à l’avance. Acompte non remboursable. Déplacement possible avec au moins 48 h de préavis. Au-delà de 15 minutes de retard, le rendez-vous est annulé. L’adresse exacte n’est communiquée qu’après confirmation.</div>
+<button class="btn primary" type="submit">Continuer vers l’acompte</button>
+</form>
+<p class="muted">Pour une séance de plus de 2 heures : <a href="mailto:maitresselanaftt@gmail.com">maitresselanaftt@gmail.com</a></p>
+</div></section>
+<script>
+const service=document.getElementById('service'), date=document.getElementById('date'), times=document.getElementById('times'), time=document.getElementById('time');
+const min=new Date(Date.now()+24*60*60*1000); date.min=min.toISOString().slice(0,10);
+async function refresh(){
+  time.value=''; times.innerHTML='<span class="muted">Chargement…</span>';
+  if(!service.value||!date.value){times.innerHTML='<span class="muted">Choisis d’abord une durée et une date.</span>';return;}
+  const r=await fetch(`/api/availability?date=${encodeURIComponent(date.value)}&service_id=${encodeURIComponent(service.value)}`);
+  const slots=await r.json(); times.innerHTML='';
+  if(!slots.length){times.innerHTML='<span class="muted">Aucun créneau disponible ce jour.</span>';return;}
+  slots.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='timebtn';b.textContent=s;b.onclick=()=>{document.querySelectorAll('.timebtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');time.value=s};times.appendChild(b);});
+}
+service.onchange=refresh; date.onchange=refresh;
+document.getElementById('bookingForm').onsubmit=(e)=>{if(!time.value){e.preventDefault();alert('Choisis une heure.');}};
+</script></body></html>

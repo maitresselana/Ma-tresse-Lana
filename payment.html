@@ -1,0 +1,12 @@
+
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acompte</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header><div class="brand">MAÎTRESSE LANA</div></header><section class="wrap"><div class="card">
+<h2>Demande #{{b.id}} enregistrée</h2>
+<p>Ton créneau est temporairement réservé pendant le paiement.</p>
+<div class="summary"><b>{{b.duration_minutes}} min</b> · {{b.start_dt.replace('T',' ')}}<br>Acompte : <b>{{b.deposit}} €</b></div>
+<p>Choisis ton moyen de paiement :</p>
+<p><a class="btn primary" href="{{ paypal }}" target="_blank" rel="noopener">Payer avec PayPal</a></p>
+<p><a class="btn secondary" href="{{ throne }}" target="_blank" rel="noopener">Passer par Throne</a></p>
+<p class="muted">Important : ces liens ne renvoient pas automatiquement une preuve de paiement au site. Après avoir vérifié l’acompte, Maîtresse Lana confirmera personnellement le rendez-vous par e-mail.</p>
+<a href="{{url_for('index')}}">Retour au site</a>
+</div></section></body></html>

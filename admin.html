@@ -1,0 +1,13 @@
+
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Planning privé</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}"></head>
+<body><header><div class="brand">PLANNING — MAÎTRESSE LANA</div><a href="{{url_for('logout')}}">Déconnexion</a></header><div class="admin">
+{% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
+<div class="card" style="max-width:none"><h2>Bloquer un créneau / une journée</h2><form method="post" action="{{url_for('admin_block')}}">
+<div class="grid"><label>Début<input type="datetime-local" name="start_dt" required></label><label>Fin<input type="datetime-local" name="end_dt" required></label></div>
+<label>Note<input name="note" placeholder="Indisponible, déplacement, etc."></label><p><button class="btn primary">Bloquer</button></p></form></div>
+<br><div class="card" style="max-width:none"><h2>Réservations</h2><table><tr><th>ID</th><th>Date</th><th>Client</th><th>Durée</th><th>Acompte</th><th>Statut</th><th>Actions</th></tr>
+{% for b in bookings %}<tr><td>#{{b.id}}</td><td>{{b.start_dt.replace('T',' ')}}</td><td>{{b.pseudo}}<br>{{b.email}}<br>Âge {{b.age}}</td><td>{{b.duration_minutes}} min</td><td>{{b.deposit}} €<br>{{b.payment_method}}</td><td><span class="status">{{b.status}}</span></td>
+<td>{% if b.status!='confirmed' %}<form style="display:inline" method="post" action="{{url_for('admin_booking_action',booking_id=b.id,action='confirm')}}"><button class="btn primary">Confirmer</button></form>{% endif %}
+{% if b.status!='cancelled' %}<form style="display:inline" method="post" action="{{url_for('admin_booking_action',booking_id=b.id,action='cancel')}}"><button class="btn danger">Annuler</button></form>{% endif %}</td></tr>{% endfor %}</table></div>
+<br><div class="card" style="max-width:none"><h2>Créneaux bloqués</h2><table><tr><th>Début</th><th>Fin</th><th>Note</th><th></th></tr>{% for x in blocks %}<tr><td>{{x.start_dt.replace('T',' ')}}</td><td>{{x.end_dt.replace('T',' ')}}</td><td>{{x.note}}</td><td><form method="post" action="{{url_for('delete_block',block_id=x.id)}}"><button class="btn danger">Supprimer</button></form></td></tr>{% endfor %}</table></div>
+</div></body></html>
