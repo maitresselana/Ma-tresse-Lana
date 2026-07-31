@@ -422,3 +422,126 @@ header h1,
   position:relative;
   z-index:3;
 }
+/* ===== HERO PREMIUM MAITRESSE LANA ===== */
+
+.hero-lana{
+  position:relative;
+  padding:28px 16px 26px;
+  background:
+    radial-gradient(circle at top left, rgba(90,20,34,.32), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(90,20,34,.24), transparent 36%),
+    #08070a;
+  overflow:hidden;
+}
+
+.hero-lana::before,
+.hero-lana::after{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:240px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 40% 30%, rgba(80,0,20,.65), transparent 34%),
+    radial-gradient(circle at 65% 60%, rgba(40,0,15,.75), transparent 42%);
+  filter:blur(10px);
+  opacity:.45;
+  pointer-events:none;
+}
+
+.hero-lana::before{
+  left:-70px;
+  top:90px;
+}
+
+.hero-lana::after{
+  right:-70px;
+  bottom:40px;
+}
+
+.hero-photo-card{
+  position:relative;
+  z-index:2;
+  max-width:680px;
+  margin:0 auto;
+  padding:2px;
+  border-radius:28px;
+  background:linear-gradient(145deg,#d8b477,#6e4d27);
+  box-shadow:0 18px 45px rgba(0,0,0,.45);
+}
+
+.hero-photo-card img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:26px;
+}
+
+.hero-text-card{
+  position:relative;
+  z-index:3;
+  max-width:680px;
+  margin:-8px auto 0;
+  padding:28px 22px 30px;
+  text-align:center;
+  border-radius:30px;
+  border:1px solid rgba(130,55,70,.38);
+  background:
+    linear-gradient(180deg,rgba(46,8,15,.98),rgba(20,8,12,.98));
+  box-shadow:0 18px 50px rgba(0,0,0,.4);
+}
+
+.hero-text-card::before{
+  content:"♛";
+  display:block;
+  margin-bottom:8px;
+  color:#d8b477;
+  font-size:24px;
+}
+
+.hero-text-card h1{
+  margin:0 0 16px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:52px;
+  line-height:.96;
+  font-weight:500;
+  color:#f5efe7;
+}
+
+.hero-text-card h1 span{
+  color:#d8b477;
+}
+
+.hero-text-card p{
+  margin:0 0 24px;
+  color:#d9d0d2;
+  font-size:18px;
+  line-height:1.55;
+}
+
+.btn-gold{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:17px 32px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#e3c583,#cda45f);
+  color:#1a1208;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+}
+
+@media(max-width:640px){
+  .hero-text-card h1{
+    font-size:44px;
+  }
+
+  .hero-text-card p{
+    font-size:16px;
+  }
+
+  .btn-gold{
+    width:100%;
+  }
+}
