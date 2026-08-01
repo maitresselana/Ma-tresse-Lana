@@ -189,6 +189,9 @@ def month_availability():
     return jsonify(result)
 @app.post("/book")
 def book():
+    if request.form.get("age_confirmed") != "on":
+        flash("Tu dois confirmer avoir 18 ans ou plus.")
+        return redirect(url_for("index"))
     service_id = request.form.get("service_id","")
     if service_id not in SERVICES:
         abort(400)
