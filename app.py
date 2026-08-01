@@ -11,7 +11,7 @@ DB = os.environ.get("DATABASE_PATH", "bookings.db")
 BOOKING_EMAIL = os.environ.get("BOOKING_EMAIL", "maitresselanaftt@gmail.com")
 PAYPAL_URL = os.environ.get("PAYPAL_URL", "https://www.paypal.me/msslana")
 THRONE_URL = os.environ.get("THRONE_URL", "https://throne.com/lanaftt")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "change-this-password")
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 HOLD_MINUTES = int(os.environ.get("HOLD_MINUTES", "30"))
 
 SERVICES = {
