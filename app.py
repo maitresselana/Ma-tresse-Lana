@@ -114,7 +114,7 @@ def send_email(to, subject, body):
             s.login(user, password)
             s.send_message(msg)
         return True
-   except Exception as e:
+    except Exception as e:
         print(f"Erreur lors de l’envoi de l’e-mail : {e}")
         return False
 @app.get("/")
