@@ -96,24 +96,27 @@ def within_open_hours(start, end):
     return start >= open_dt and end <= close_dt
 
 def send_email(to, subject, body):
-    host = os.environ.get("SMTP_HOST")
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    user = os.environ.get("SMTP_USER")
-    password = os.environ.get("SMTP_PASSWORD")
-    if not (host and user and password):
+    try:
+        host = os.environ.get("SMTP_HOST")
+        port = int(os.environ.get("SMTP_PORT", "587"))
+        user = os.environ.get("SMTP_USER")
+        password = os.environ.get("SMTP_PASSWORD")
+        if not (host and user and password):
+            return False
+        msg = EmailMessage()
+        msg["From"] = user
+        msg["To"] = to
+        msg["Subject"] = subject
+        msg.set_content(body)
+        context = ssl.create_default_context()
+        with smtplib.SMTP(host, port, timeout=20) as s:
+            s.starttls(context=context)
+            s.login(user, password)
+            s.send_message(msg)
+        return True
+   except Exception as e:
+        print(f"Erreur lors de l’envoi de l’e-mail : {e}")
         return False
-    msg = EmailMessage()
-    msg["From"] = user
-    msg["To"] = to
-    msg["Subject"] = subject
-    msg.set_content(body)
-    context = ssl.create_default_context()
-    with smtplib.SMTP(host, port, timeout=20) as s:
-        s.starttls(context=context)
-        s.login(user, password)
-        s.send_message(msg)
-    return True
-
 @app.get("/")
 def index():
     return render_template("index.html", services=SERVICES)
