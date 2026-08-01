@@ -349,7 +349,29 @@ Maîtresse Lana
         send_email(b["email"], f"Rendez-vous annulé #{b['id']}", body)
 
     return redirect(url_for("admin"))
+@app.post("/admin/block")
+def admin_block():
+    if not session.get("admin"):
+        abort(403)
+    try:
+        start = datetime.fromisoformat(request.form.get("start_dt"))
+        end = datetime.fromisoformat(request.form.get("end_dt"))
+    except Exception:
+        flash("Dates invalides.")
+        return redirect(url_for("admin"))
 
+    if end <= start:
+        flash("La fin doit être après le début.")
+        return redirect(url_for("admin"))
+
+    con = db()
+    con.execute(
+        "INSERT INTO blocks(start_dt,end_dt,note) VALUES(?,?,?)",
+        (dtstr(start), dtstr(end), request.form.get("note", "").strip())
+    )
+    con.commit()
+    con.close()
+    return redirect(url_for("admin"))
 @app.post("/admin/block/<int:block_id>/delete")
 def delete_block(block_id):
     if not session.get("admin"):
