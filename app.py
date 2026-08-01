@@ -120,7 +120,9 @@ def send_email(to, subject, body):
 @app.get("/")
 def index():
     return render_template("index.html", services=SERVICES)
-
+@app.get("/pratiques")
+def pratiques():
+    return render_template("pratiques.html")
 @app.get("/api/availability")
 def availability():
     date_s = request.args.get("date","")
