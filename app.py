@@ -321,7 +321,7 @@ def admin_booking_action(booking_id, action):
     con.execute("UPDATE bookings SET status=?, hold_expires_at=NULL WHERE id=?", (status, booking_id))
     con.commit()
     con.close()
-        if status == "confirmed":
+    if status == "confirmed":
         body = f"""Bonjour {b['pseudo']},
 
 Ton rendez-vous #{b['id']} est confirmé.
