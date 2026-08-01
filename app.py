@@ -5,7 +5,7 @@ from email.message import EmailMessage
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, abort
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "change-me-in-production")
+app.secret_key = os.environ["SECRET_KEY"]
 DB = os.environ.get("DATABASE_PATH", "bookings.db")
 
 BOOKING_EMAIL = os.environ.get("BOOKING_EMAIL", "maitresselanaftt@gmail.com")
