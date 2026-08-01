@@ -80,7 +80,9 @@ def booking_conflict(start, end, ignore_id=None):
     if ignore_id:
         sql += " AND id != ?"
         params.append(ignore_id)
-    booking = con.execute(sql, params).fetchone()
+    bookings = con.execute(
+    "SELECT * FROM bookings WHERE status != 'cancelled' ORDER BY start_dt DESC"
+).fetchall()
     block = con.execute(
         "SELECT * FROM blocks WHERE start_dt < ? AND end_dt > ?",
         (dtstr(end), dtstr(start))
