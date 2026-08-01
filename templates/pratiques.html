@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pratiques & Conditions — Maîtresse Lana</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    :root{
+      --pc-bg:#09090b;
+      --pc-panel:#121216;
+      --pc-panel-soft:#18181d;
+      --pc-text:#f7f2ea;
+      --pc-muted:#b5aaa4;
+      --pc-gold:#c9aa6a;
+      --pc-gold-light:#e0c58f;
+      --pc-wine:#5a1422;
+      --pc-line:#332c30;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      color:var(--pc-text);
+      background:
+        radial-gradient(circle at 85% 8%,rgba(90,20,34,.22),transparent 26%),
+        radial-gradient(circle at 12% 52%,rgba(201,170,106,.07),transparent 28%),
+        linear-gradient(180deg,#08080a,#0d0d11 48%,#09090b);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .pc-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:16px 6vw;
+      border-bottom:1px solid var(--pc-line);
+      background:rgba(9,9,11,.9);
+      backdrop-filter:blur(16px);
+    }
+
+    .pc-brand{
+      color:var(--pc-gold-light);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(1.05rem,2.8vw,1.65rem);
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .pc-nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pc-nav a{
+      text-decoration:none;
+    }
+
+    .pc-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:12px 20px;
+      border-radius:999px;
+      border:1px solid rgba(201,170,106,.55);
+      color:var(--pc-gold-light);
+      background:transparent;
+      font-weight:800;
+      transition:.2s ease;
+    }
+
+    .pc-btn:hover{
+      transform:translateY(-1px);
+      border-color:var(--pc-gold-light);
+    }
+
+    .pc-btn-primary{
+      border:0;
+      color:#15110a;
+      background:linear-gradient(135deg,var(--pc-gold-light),var(--pc-gold));
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+    }
+
+    .pc-hero{
+      position:relative;
+      min-height:78vh;
+      display:flex;
+      align-items:flex-end;
+      overflow:hidden;
+      isolation:isolate;
+      border-bottom:1px solid var(--pc-line);
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.35) 44%,rgba(0,0,0,.92) 100%),
+        url("{{ url_for('static', filename='pratiques-couronne.jpeg') }}") center 26%/cover no-repeat;
+    }
+
+    .pc-hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      background:
+        radial-gradient(circle at 80% 20%,rgba(201,170,106,.12),transparent 26%),
+        radial-gradient(circle at 18% 80%,rgba(90,20,34,.34),transparent 30%);
+    }
+
+    .pc-hero::after{
+      content:"";
+      position:absolute;
+      inset:22px;
+      border:1px solid rgba(201,170,106,.25);
+      border-radius:30px;
+      pointer-events:none;
+    }
+
+    .pc-hero-inner{
+      width:min(1120px,100%);
+      margin:0 auto;
+      padding:120px 6vw 74px;
+    }
+
+    .pc-kicker{
+      margin:0 0 14px;
+      color:var(--pc-gold-light);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+    }
+
+    .pc-hero h1{
+      margin:0;
+      max-width:900px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(3.25rem,9vw,7.2rem);
+      font-weight:500;
+      line-height:.9;
+      letter-spacing:-.035em;
+      text-shadow:0 12px 35px rgba(0,0,0,.65);
+    }
+
+    .pc-hero p{
+      max-width:720px;
+      margin:24px 0 0;
+      color:#e2d9d2;
+      font-size:clamp(1rem,2vw,1.18rem);
+      line-height:1.75;
+      text-shadow:0 4px 18px rgba(0,0,0,.8);
+    }
+
+    .pc-main{
+      width:min(1120px,100%);
+      margin:0 auto;
+      padding:70px 6vw 90px;
+    }
+
+    .pc-section{
+      margin-bottom:58px;
+    }
+
+    .pc-eyebrow{
+      margin:0 0 10px;
+      color:var(--pc-gold);
+      font-size:.76rem;
+      font-weight:800;
+      letter-spacing:.24em;
+      text-transform:uppercase;
+    }
+
+    .pc-title{
+      margin:0 0 24px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2.1rem,5vw,3.7rem);
+      font-weight:500;
+      color:var(--pc-text);
+    }
+
+    .pc-intro{
+      padding:36px;
+      border:1px solid var(--pc-line);
+      border-radius:28px;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.018),transparent),
+        rgba(18,18,22,.94);
+      box-shadow:0 28px 75px rgba(0,0,0,.3);
+    }
+
+    .pc-intro p{
+      margin:0;
+      color:#d1c7c0;
+      line-height:1.85;
+      font-size:1.02rem;
+    }
+
+    .pc-intro p + p{
+      margin-top:14px;
+    }
+
+    .pc-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:22px;
+    }
+
+    .pc-card{
+      position:relative;
+      overflow:hidden;
+      padding:30px;
+      border:1px solid var(--pc-line);
+      border-radius:24px;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.016),transparent),
+        var(--pc-panel);
+      box-shadow:0 20px 55px rgba(0,0,0,.22);
+    }
+
+    .pc-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:2px;
+      background:linear-gradient(90deg,transparent,var(--pc-gold),transparent);
+      opacity:.75;
+    }
+
+    .pc-card h3{
+      margin:0 0 18px;
+      color:var(--pc-gold-light);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.55rem;
+      font-weight:500;
+    }
+
+    .pc-list{
+      margin:0;
+      padding:0;
+      list-style:none;
+      columns:2;
+      column-gap:24px;
+    }
+
+    .pc-list li{
+      position:relative;
+      break-inside:avoid;
+      padding:7px 0 7px 18px;
+      color:#ddd4cd;
+      line-height:1.5;
+    }
+
+    .pc-list li::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:16px;
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:var(--pc-gold);
+      box-shadow:0 0 12px rgba(201,170,106,.35);
+    }
+
+    .pc-wide{
+      grid-column:1/-1;
+    }
+
+    .pc-limit-card{
+      border-color:rgba(90,20,34,.7);
+      background:
+        radial-gradient(circle at top right,rgba(90,20,34,.18),transparent 30%),
+        linear-gradient(180deg,rgba(255,255,255,.012),transparent),
+        var(--pc-panel);
+    }
+
+    .pc-note{
+      margin:22px 0 0;
+      padding:18px 20px;
+      border-radius:16px;
+      border:1px solid rgba(201,170,106,.24);
+      background:#171419;
+      color:#cfc4bc;
+      line-height:1.7;
+    }
+
+    .pc-contact{
+      display:grid;
+      grid-template-columns:1.3fr .7fr;
+      gap:24px;
+      align-items:center;
+      padding:36px;
+      border:1px solid var(--pc-line);
+      border-radius:28px;
+      background:
+        radial-gradient(circle at 85% 20%,rgba(201,170,106,.1),transparent 28%),
+        linear-gradient(135deg,#211017,#121216 62%);
+      box-shadow:0 28px 75px rgba(0,0,0,.28);
+    }
+
+    .pc-contact h2{
+      margin:0 0 12px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2rem,5vw,3.3rem);
+      font-weight:500;
+    }
+
+    .pc-contact p{
+      margin:0;
+      color:#d1c7c0;
+      line-height:1.75;
+    }
+
+    .pc-email{
+      display:inline-block;
+      margin-top:16px;
+      color:var(--pc-gold-light);
+      font-weight:800;
+      text-decoration:none;
+      word-break:break-word;
+    }
+
+    .pc-contact-actions{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:stretch;
+    }
+
+    .pc-footer{
+      padding:24px 6vw 38px;
+      text-align:center;
+      color:#8f8580;
+      font-size:.88rem;
+      border-top:1px solid var(--pc-line);
+    }
+
+    @media(max-width:820px){
+      .pc-header{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .pc-nav{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .pc-hero{
+        min-height:68vh;
+        background-position:center 18%;
+      }
+
+      .pc-hero::after{
+        inset:12px;
+        border-radius:22px;
+      }
+
+      .pc-hero-inner{
+        padding:100px 22px 48px;
+      }
+
+      .pc-main{
+        padding:48px 18px 70px;
+      }
+
+      .pc-grid{
+        grid-template-columns:1fr;
+      }
+
+      .pc-wide{
+        grid-column:auto;
+      }
+
+      .pc-card,
+      .pc-intro,
+      .pc-contact{
+        padding:23px;
+        border-radius:20px;
+      }
+
+      .pc-list{
+        columns:1;
+      }
+
+      .pc-contact{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="pc-header">
+    <div class="pc-brand">Maîtresse Lana</div>
+
+    <nav class="pc-nav" aria-label="Navigation principale">
+      <a class="pc-btn" href="{{ url_for('index') }}">Accueil</a>
+      <a class="pc-btn pc-btn-primary" href="{{ url_for('index') }}#reservation">Réserver</a>
+    </nav>
+  </header>
+
+  <section class="pc-hero">
+    <div class="pc-hero-inner">
+      <p class="pc-kicker">Mon univers</p>
+      <h1>Pratiques & Conditions</h1>
+      <p>
+        Découvrez les pratiques proposées, mes limites et le cadre dans lequel chaque séance est préparée.
+      </p>
+    </div>
+  </section>
+
+  <main class="pc-main">
+    <section class="pc-section">
+      <p class="pc-eyebrow">L’expérience</p>
+      <div class="pc-intro">
+        <p>
+          Chaque rencontre débute par un échange préalable permettant de définir vos attentes,
+          votre expérience ainsi que vos limites.
+        </p>
+        <p>
+          J’accorde une importance particulière à la communication, au respect et à la discrétion.
+          Chaque séance est construite sur mesure, dans un cadre clair et défini.
+        </p>
+        <p>
+          Je me réserve le droit d’accepter ou de refuser toute réservation ou pratique
+          qui ne correspondrait pas à mon univers.
+        </p>
+      </div>
+    </section>
+
+    <section class="pc-section">
+      <p class="pc-eyebrow">Séances</p>
+      <h2 class="pc-title">Pratiques proposées</h2>
+
+      <div class="pc-grid">
+        <article class="pc-card">
+          <h3>Fétichisme des pieds & des chaussures</h3>
+          <ul class="pc-list">
+            <li>Vénération des pieds</li>
+            <li>Pieds odorants</li>
+            <li>Pieds sales</li>
+            <li>Massage des pieds</li>
+            <li>Foot gagging</li>
+            <li>Trampling</li>
+            <li>Repose-pieds</li>
+            <li>Paillasson humain</li>
+            <li>Fétichisme du nylon</li>
+            <li>Fétichisme du cuir</li>
+            <li>Chaussures</li>
+            <li>Talons</li>
+            <li>Bottes</li>
+          </ul>
+        </article>
+
+        <article class="pc-card">
+          <h3>Domination & humiliation</h3>
+          <ul class="pc-list">
+            <li>Humiliation</li>
+            <li>Ignore réel</li>
+            <li>Sissy training</li>
+            <li>Crachats</li>
+            <li>Cendrier humain</li>
+          </ul>
+        </article>
+
+        <article class="pc-card">
+          <h3>Jeux d’impact & contrôle</h3>
+          <ul class="pc-list">
+            <li>Ball busting</li>
+            <li>Jeux de tétons</li>
+            <li>Bondage</li>
+            <li>Gifles / slapping</li>
+          </ul>
+        </article>
+
+        <article class="pc-card">
+          <h3>Autres fétichismes</h3>
+          <ul class="pc-list">
+            <li>Fétichisme des aisselles</li>
+          </ul>
+        </article>
+
+        <article class="pc-card pc-wide pc-limit-card">
+          <h3>Mes limites</h3>
+          <ul class="pc-list">
+            <li>Pas de rapports sexuels</li>
+            <li>Pas de nudité</li>
+            <li>Pas de pegging</li>
+            <li>Pas de facesitting</li>
+            <li>Pas de footjob</li>
+            <li>Pas de pratiques impliquant du sang</li>
+          </ul>
+
+          <p class="pc-note">
+            Toute pratique non mentionnée peut être envisagée après échange préalable
+            et reste soumise à mon accord.
+          </p>
+        </article>
+
+        <article class="pc-card pc-wide">
+          <h3>Conditions</h3>
+          <ul class="pc-list">
+            <li>Réservé exclusivement aux personnes majeures</li>
+            <li>Hygiène irréprochable exigée</li>
+            <li>Les pratiques sont définies avant la séance</li>
+            <li>Respect indispensable avant, pendant et après la rencontre</li>
+            <li>Toute pratique reste soumise à mon accord</li>
+            <li>Une séance peut être interrompue si les conditions convenues ne sont pas respectées</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="pc-contact">
+      <div>
+        <p class="pc-eyebrow">Demandes particulières</p>
+        <h2>Une pratique ne figure pas dans la liste ?</h2>
+        <p>
+          Toute demande spécifique peut être étudiée après échange préalable.
+        </p>
+        <a class="pc-email" href="mailto:maitresselanaftt@gmail.com">
+          maitresselanaftt@gmail.com
+        </a>
+      </div>
+
+      <div class="pc-contact-actions">
+        <a class="pc-btn pc-btn-primary" href="{{ url_for('index') }}#reservation">
+          Réserver une séance
+        </a>
+        <a class="pc-btn" href="{{ url_for('index') }}">
+          Retour à l’accueil
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pc-footer">
+    Maîtresse Lana — Pratiques & Conditions
+  </footer>
+</body>
+</html>
