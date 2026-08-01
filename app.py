@@ -336,6 +336,16 @@ Toute modification du rendez-vous doit être demandée au moins 48 h à l’avan
 Au-delà de 15 minutes de retard, le rendez-vous est annulé.
 """
         send_email(b["email"], f"Rendez-vous confirmé #{b['id']}", body)
+        if status == "cancelled":
+    body = f"""Bonjour {b['pseudo']},
+
+Ta demande de rendez-vous #{b['id']} a été refusée.
+
+Si tu as déjà envoyé l’acompte, celui-ci te sera remboursé après vérification du paiement.
+
+Maîtresse Lana
+"""
+    send_email(b["email"], f"Rendez-vous annulé #{b['id']}", body)
     return redirect(url_for("admin"))
 
 @app.post("/admin/block")
