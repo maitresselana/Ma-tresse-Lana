@@ -298,7 +298,9 @@ def admin():
     if not session.get("admin"):
         return redirect(url_for("login"))
     con = db()
-    bookings = con.execute("SELECT * FROM bookings ORDER BY start_dt DESC").fetchall()
+    bookings = con.execute(
+    "SELECT * FROM bookings WHERE status != 'cancelled' ORDER BY start_dt DESC"
+).fetchall()
     blocks = con.execute("SELECT * FROM blocks ORDER BY start_dt DESC").fetchall()
     con.close()
     return render_template("admin.html", bookings=bookings, blocks=blocks)
