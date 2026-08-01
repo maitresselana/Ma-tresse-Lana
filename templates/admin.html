@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administration — Maîtresse Lana</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    :root{
+      --a-bg:#09090b;
+      --a-panel:#131317;
+      --a-panel-soft:#18181d;
+      --a-line:#312d33;
+      --a-text:#f7f2ea;
+      --a-muted:#aaa1a5;
+      --a-gold:#d9b66f;
+      --a-gold-soft:#f0d49b;
+      --a-green:#8cc49c;
+      --a-red:#e49aa9;
+      --a-blue:#a9b9df;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--a-text);
+      background:
+        radial-gradient(circle at 86% 4%,rgba(104,28,48,.22),transparent 25%),
+        linear-gradient(180deg,#08080a,#0d0d11 55%,#09090b);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .admin-topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:15px 5vw;
+      border-bottom:1px solid var(--a-line);
+      background:rgba(9,9,11,.92);
+      backdrop-filter:blur(16px);
+    }
+
+    .admin-brand{
+      color:var(--a-gold-soft);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(1.05rem,3vw,1.55rem);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .admin-top-actions{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .admin-btn{
+      appearance:none;
+      border:1px solid rgba(217,182,111,.48);
+      border-radius:999px;
+      padding:11px 17px;
+      min-height:43px;
+      color:var(--a-gold-soft);
+      background:transparent;
+      text-decoration:none;
+      font:inherit;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .admin-btn-primary{
+      border:0;
+      color:#181208;
+      background:linear-gradient(135deg,#f0d49b,#c9a55d);
+    }
+
+    .admin-btn-danger{
+      border-color:rgba(228,154,169,.55);
+      color:#f2adba;
+      background:rgba(99,29,45,.13);
+    }
+
+    .admin-shell{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:38px 5vw 80px;
+    }
+
+    .admin-hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:25px;
+      margin-bottom:28px;
+    }
+
+    .admin-kicker{
+      margin:0 0 7px;
+      color:var(--a-gold);
+      font-size:.76rem;
+      font-weight:900;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+
+    .admin-hero h1{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2.5rem,7vw,5rem);
+      font-weight:500;
+      line-height:.95;
+    }
+
+    .admin-hero p{
+      max-width:600px;
+      margin:14px 0 0;
+      color:var(--a-muted);
+      line-height:1.7;
+    }
+
+    .flash{
+      margin-bottom:18px;
+      padding:15px 18px;
+      border:1px solid rgba(217,182,111,.35);
+      border-radius:16px;
+      color:var(--a-gold-soft);
+      background:#171318;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      margin-bottom:28px;
+    }
+
+    .stat{
+      padding:21px;
+      border:1px solid var(--a-line);
+      border-radius:20px;
+      background:rgba(19,19,23,.94);
+      box-shadow:0 18px 45px rgba(0,0,0,.22);
+    }
+
+    .stat strong{
+      display:block;
+      margin-bottom:4px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:2rem;
+      color:var(--a-text);
+    }
+
+    .stat span{
+      color:var(--a-muted);
+      font-size:.92rem;
+    }
+
+    .admin-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);
+      gap:24px;
+      align-items:start;
+    }
+
+    .panel{
+      padding:25px;
+      border:1px solid var(--a-line);
+      border-radius:24px;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.015),transparent),
+        rgba(19,19,23,.96);
+      box-shadow:0 24px 64px rgba(0,0,0,.25);
+    }
+
+    .panel + .panel{
+      margin-top:24px;
+    }
+
+    .panel-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .panel-title h2{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(1.8rem,4vw,2.65rem);
+      font-weight:500;
+    }
+
+    .panel-title span{
+      color:var(--a-muted);
+      font-size:.9rem;
+    }
+
+    .booking-list{
+      display:grid;
+      gap:15px;
+    }
+
+    .booking-card{
+      padding:20px;
+      border:1px solid var(--a-line);
+      border-radius:20px;
+      background:var(--a-panel-soft);
+    }
+
+    .booking-card.is-pending{
+      border-color:rgba(169,185,223,.36);
+    }
+
+    .booking-card.is-confirmed{
+      border-color:rgba(217,182,111,.45);
+    }
+
+    .booking-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      margin-bottom:16px;
+    }
+
+    .booking-date{
+      margin:0;
+      font-size:1.12rem;
+      font-weight:900;
+    }
+
+    .booking-id{
+      margin-top:4px;
+      color:var(--a-muted);
+      font-size:.86rem;
+    }
+
+    .status{
+      flex:none;
+      display:inline-flex;
+      align-items:center;
+      min-height:34px;
+      padding:7px 12px;
+      border:1px solid var(--a-line);
+      border-radius:999px;
+      font-size:.84rem;
+      font-weight:800;
+    }
+
+    .status.pending{
+      color:var(--a-blue);
+      border-color:rgba(169,185,223,.45);
+    }
+
+    .status.confirmed{
+      color:var(--a-gold-soft);
+      border-color:rgba(217,182,111,.5);
+    }
+
+    .booking-info{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:13px;
+      margin-bottom:18px;
+    }
+
+    .info{
+      padding:13px;
+      border:1px solid rgba(255,255,255,.055);
+      border-radius:14px;
+      background:#111115;
+      min-width:0;
+    }
+
+    .info-label{
+      display:block;
+      margin-bottom:4px;
+      color:var(--a-muted);
+      font-size:.75rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .info-value{
+      display:block;
+      color:var(--a-text);
+      line-height:1.45;
+      overflow-wrap:anywhere;
+    }
+
+    .booking-message{
+      margin:0 0 18px;
+      padding:13px 15px;
+      border-left:2px solid var(--a-gold);
+      border-radius:0 12px 12px 0;
+      color:#d4cbd0;
+      background:#111115;
+      line-height:1.6;
+    }
+
+    .booking-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .booking-actions form{
+      margin:0;
+    }
+
+    .empty{
+      padding:35px 20px;
+      text-align:center;
+      color:var(--a-muted);
+      border:1px dashed var(--a-line);
+      border-radius:18px;
+    }
+
+    .block-form label{
+      display:block;
+      margin-bottom:15px;
+      color:#eee7df;
+      font-weight:800;
+    }
+
+    .block-form input{
+      width:100%;
+      margin-top:8px;
+      padding:14px 15px;
+      border:1px solid #39343c;
+      border-radius:14px;
+      color:var(--a-text);
+      background:#0e0e12;
+      font:inherit;
+    }
+
+    .block-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .block-card{
+      padding:16px;
+      border:1px solid var(--a-line);
+      border-radius:16px;
+      background:#111115;
+    }
+
+    .block-card strong{
+      display:block;
+      margin-bottom:5px;
+    }
+
+    .block-card p{
+      margin:0 0 12px;
+      color:var(--a-muted);
+      line-height:1.55;
+    }
+
+    @media(max-width:900px){
+      .admin-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:680px){
+      .admin-topbar{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .admin-top-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .admin-shell{
+        padding:28px 16px 60px;
+      }
+
+      .admin-hero{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .panel{
+        padding:18px;
+        border-radius:19px;
+      }
+
+      .booking-info{
+        grid-template-columns:1fr;
+      }
+
+      .booking-head{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .admin-btn{
+        width:100%;
+      }
+
+      .booking-actions,
+      .booking-actions form{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% set ns = namespace(pending=0, confirmed=0) %}
+  {% for b in bookings %}
+    {% if b.status == 'confirmed' %}
+      {% set ns.confirmed = ns.confirmed + 1 %}
+    {% else %}
+      {% set ns.pending = ns.pending + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  <header class="admin-topbar">
+    <div class="admin-brand">Planning privé — Maîtresse Lana</div>
+
+    <div class="admin-top-actions">
+      <a class="admin-btn" href="{{ url_for('index') }}">Voir le site</a>
+      <a class="admin-btn admin-btn-danger" href="{{ url_for('logout') }}">Déconnexion</a>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    {% with messages=get_flashed_messages() %}
+      {% for m in messages %}
+        <div class="flash">{{ m }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <section class="admin-hero">
+      <div>
+        <p class="admin-kicker">Espace privé</p>
+        <h1>Mes rendez-vous</h1>
+        <p>
+          Consulte les nouvelles demandes, confirme les séances et gère tes indisponibilités.
+        </p>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <strong>{{ ns.pending }}</strong>
+        <span>En attente</span>
+      </div>
+
+      <div class="stat">
+        <strong>{{ ns.confirmed }}</strong>
+        <span>Confirmées</span>
+      </div>
+
+      <div class="stat">
+        <strong>{{ blocks|length }}</strong>
+        <span>Créneaux bloqués</span>
+      </div>
+    </section>
+
+    <div class="admin-grid">
+      <section>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Réservations</h2>
+            <span>{{ bookings|length }} au total</span>
+          </div>
+
+          {% if bookings %}
+            <div class="booking-list">
+              {% for b in bookings %}
+                <article class="booking-card {% if b.status == 'confirmed' %}is-confirmed{% else %}is-pending{% endif %}">
+                  <div class="booking-head">
+                    <div>
+                      <p class="booking-date">{{ b.start_dt.replace('T',' ') }}</p>
+                      <div class="booking-id">Réservation #{{ b.id }}</div>
+                    </div>
+
+                    {% if b.status == 'confirmed' %}
+                      <span class="status confirmed">Confirmée</span>
+                    {% else %}
+                      <span class="status pending">En attente</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="booking-info">
+                    <div class="info">
+                      <span class="info-label">Client</span>
+                      <span class="info-value">
+                        <strong>{{ b.pseudo }}</strong><br>
+                        {{ b.email }}
+                        {% if b.twitter %}<br>{{ b.twitter }}{% endif %}
+                      </span>
+                    </div>
+
+                    <div class="info">
+                      <span class="info-label">Séance</span>
+                      <span class="info-value">
+                        <strong>{{ b.duration_minutes }} min</strong><br>
+                        {{ b.price }} € au total
+                      </span>
+                    </div>
+
+                    <div class="info">
+                      <span class="info-label">Acompte</span>
+                      <span class="info-value">
+                        <strong>{{ b.deposit }} €</strong><br>
+                        {{ b.payment_method }}
+                      </span>
+                    </div>
+
+                    <div class="info">
+                      <span class="info-label">Âge</span>
+                      <span class="info-value">{{ b.age }} ans</span>
+                    </div>
+                  </div>
+
+                  {% if b.message %}
+                    <p class="booking-message">{{ b.message }}</p>
+                  {% endif %}
+
+                  <div class="booking-actions">
+                    {% if b.status != 'confirmed' %}
+                      <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='confirm') }}">
+                        <button class="admin-btn admin-btn-primary" type="submit">Confirmer</button>
+                      </form>
+                    {% endif %}
+
+                    <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='cancel') }}">
+                      <button class="admin-btn admin-btn-danger" type="submit">
+                        {% if b.status == 'confirmed' %}Annuler le rendez-vous{% else %}Refuser la demande{% endif %}
+                      </button>
+                    </form>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty">Aucune réservation à afficher.</div>
+          {% endif %}
+        </div>
+      </section>
+
+      <aside>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Bloquer un créneau</h2>
+          </div>
+
+          <form class="block-form" method="post" action="{{ url_for('admin_block') }}">
+            <label>
+              Début
+              <input type="datetime-local" name="start_dt" required>
+            </label>
+
+            <label>
+              Fin
+              <input type="datetime-local" name="end_dt" required>
+            </label>
+
+            <label>
+              Note
+              <input name="note" placeholder="Indisponible, déplacement...">
+            </label>
+
+            <button class="admin-btn admin-btn-primary" type="submit">Bloquer le créneau</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Indisponibilités</h2>
+            <span>{{ blocks|length }}</span>
+          </div>
+
+          {% if blocks %}
+            <div class="block-list">
+              {% for x in blocks %}
+                <article class="block-card">
+                  <strong>{{ x.start_dt.replace('T',' ') }}</strong>
+                  <p>
+                    Jusqu’au {{ x.end_dt.replace('T',' ') }}<br>
+                    {{ x.note or 'Indisponible' }}
+                  </p>
+
+                  <form method="post" action="{{ url_for('delete_block', block_id=x.id) }}">
+                    <button class="admin-btn admin-btn-danger" type="submit">Supprimer</button>
+                  </form>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty">Aucun créneau bloqué.</div>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
