@@ -321,7 +321,7 @@ def admin_booking_action(booking_id, action):
     con.execute("UPDATE bookings SET status=?, hold_expires_at=NULL WHERE id=?", (status, booking_id))
     con.commit()
     con.close()
-    if status == "confirmed":
+        if status == "confirmed":
         body = f"""Bonjour {b['pseudo']},
 
 Ton rendez-vous #{b['id']} est confirmé.
@@ -336,8 +336,9 @@ Toute modification du rendez-vous doit être demandée au moins 48 h à l’avan
 Au-delà de 15 minutes de retard, le rendez-vous est annulé.
 """
         send_email(b["email"], f"Rendez-vous confirmé #{b['id']}", body)
-        if status == "cancelled":
-    body = f"""Bonjour {b['pseudo']},
+
+    if status == "cancelled":
+        body = f"""Bonjour {b['pseudo']},
 
 Ta demande de rendez-vous #{b['id']} a été refusée.
 
@@ -345,26 +346,8 @@ Si tu as déjà envoyé l’acompte, celui-ci te sera remboursé après vérific
 
 Maîtresse Lana
 """
-    send_email(b["email"], f"Rendez-vous annulé #{b['id']}", body)
-    return redirect(url_for("admin"))
+        send_email(b["email"], f"Rendez-vous annulé #{b['id']}", body)
 
-@app.post("/admin/block")
-def admin_block():
-    if not session.get("admin"):
-        abort(403)
-    try:
-        start = datetime.fromisoformat(request.form.get("start_dt"))
-        end = datetime.fromisoformat(request.form.get("end_dt"))
-    except Exception:
-        flash("Dates invalides.")
-        return redirect(url_for("admin"))
-    if end <= start:
-        flash("La fin doit être après le début.")
-        return redirect(url_for("admin"))
-    con = db()
-    con.execute("INSERT INTO blocks(start_dt,end_dt,note) VALUES(?,?,?)",
-                (dtstr(start), dtstr(end), request.form.get("note","").strip()))
-    con.commit(); con.close()
     return redirect(url_for("admin"))
 
 @app.post("/admin/block/<int:block_id>/delete")
