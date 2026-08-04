@@ -1,0 +1,23 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Avis — Maîtresse Lana</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+body{margin:0;background:#09090c;color:#f7f2ea}.shell{width:min(950px,100%);margin:auto;padding:32px 18px 70px}
+h1{font:500 clamp(2.7rem,8vw,5rem) Georgia,serif;color:#efd49a;text-align:center}.intro{text-align:center;color:#aaa1a7;line-height:1.7}
+.nav,.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:18px 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card,.form{padding:21px;border:1px solid #312d35;border-radius:19px;background:#15151a}.stars{color:#e2bd70;letter-spacing:.12em}
+.badge{font-size:.72rem;color:#efd49a;border:1px solid #665536;border-radius:999px;padding:4px 8px}.comment{white-space:pre-wrap;line-height:1.65}
+.form{margin-top:24px}.form label{display:block;margin:14px 0;font-weight:800}.form input,.form select,.form textarea{width:100%;margin-top:7px;padding:13px;border:1px solid #3b363e;border-radius:12px;background:#0e0e12;color:#fff}.form textarea{min-height:130px}
+.flash,.empty{padding:15px;border:1px solid #493f32;border-radius:14px;margin-bottom:16px;color:#efd49a}.empty{text-align:center;color:#aaa1a7}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style></head><body><main class="shell">
+{% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
+<h1>Avis des clients</h1><p class="intro">Vous avez déjà vécu une séance avec Maîtresse Lana ? Partagez votre expérience. Chaque avis est validé avant publication.</p>
+<div class="nav"><a class="btn secondary" href="{{ url_for('index') }}">Retour au site</a><a class="btn primary" href="#formulaire">Laisser un avis</a></div>
+{% if reviews %}<section class="grid">{% for r in reviews %}<article class="card"><div class="stars">{{'★'*r.rating}}{{'☆'*(5-r.rating)}}</div><h2>{{r.pseudo}} {% if r.verified %}<span class="badge">Client vérifié</span>{% endif %}</h2><div class="comment">{{r.comment}}</div></article>{% endfor %}</section>{% else %}<div class="empty">Aucun avis publié pour le moment.</div>{% endif %}
+<section class="form" id="formulaire"><h2>Laisser un avis</h2><form method="post">
+<label>Pseudo<input name="pseudo" maxlength="80" required></label>
+<label>Note<select name="rating" required><option value="">Choisir</option><option value="5">5 — Excellent</option><option value="4">4 — Très bien</option><option value="3">3 — Bien</option><option value="2">2 — Moyen</option><option value="1">1 — Décevant</option></select></label>
+<label>E-mail (optionnel, jamais affiché)<input name="email" type="email" maxlength="160"></label>
+<label>Votre avis<textarea name="comment" maxlength="1500" required></textarea></label>
+<button class="btn primary" type="submit">Envoyer l’avis</button></form></section>
+</main></body></html>
