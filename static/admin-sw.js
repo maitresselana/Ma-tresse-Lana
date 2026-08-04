@@ -1,4 +1,4 @@
-const CACHE_NAME = "admin-lana-v2";
+const CACHE_NAME = "admin-lana-v3";
 
 const APP_SHELL = [
   "/admin",
@@ -9,9 +9,7 @@ const APP_SHELL = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
   );
 
   self.skipWaiting();
@@ -19,13 +17,13 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
+    caches.keys().then((keys) =>
+      Promise.all(
         keys
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
-      );
-    })
+      )
+    )
   );
 
   self.clients.claim();
@@ -67,7 +65,7 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
   let data = {
     title: "Admin Lana",
-    body: "Nouvelle activité",
+    body: "Nouvelle réservation",
     url: "/admin",
     icon: "/static/admin-icon-192.png",
     badge: "/static/admin-icon-192.png"
@@ -85,16 +83,22 @@ self.addEventListener("push", (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon,
-      badge: data.badge,
-      data: {
-        url: data.url
-      },
-      tag: "nouvelle-reservation",
-      renotify: true
-    })
+    Promise.all([
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: data.icon,
+        badge: data.badge,
+        data: {
+          url: data.url
+        },
+        tag: "nouvelle-reservation",
+        renotify: true
+      }),
+
+      self.registration.setAppBadge
+        ? self.registration.setAppBadge(1)
+        : Promise.resolve()
+    ])
   );
 });
 
@@ -105,20 +109,34 @@ self.addEventListener("notificationclick", (event) => {
     event.notification.data?.url || "/admin";
 
   event.waitUntil(
-    clients
-      .matchAll({
-        type: "window",
-        includeUncontrolled: true
-      })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if ("focus" in client) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
-        }
+    Promise.all([
+      self.registration.clearAppBadge
+        ? self.registration.clearAppBadge()
+        : Promise.resolve(),
 
-        return clients.openWindow(targetUrl);
-      })
+      clients
+        .matchAll({
+          type: "window",
+          includeUncontrolled: true
+        })
+        .then((clientList) => {
+          for (const client of clientList) {
+            if ("focus" in client) {
+              client.navigate(targetUrl);
+              return client.focus();
+            }
+          }
+
+          return clients.openWindow(targetUrl);
+        })
+    ])
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "CLEAR_BADGE") {
+    if (self.registration.clearAppBadge) {
+      self.registration.clearAppBadge();
+    }
+  }
 });
