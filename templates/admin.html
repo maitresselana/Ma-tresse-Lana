@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Planning privé — Maîtresse Lana</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+<header>
+  <div class="brand">PLANNING — MAÎTRESSE LANA</div>
+  <a class="btn secondary" href="{{ url_for('logout') }}">Déconnexion</a>
+</header>
+
+<div class="admin">
+
+  {% with messages=get_flashed_messages() %}
+    {% for m in messages %}
+      <div class="flash">{{ m }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card" style="max-width:none;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+      <div>
+        <div class="muted">ESPACE PRIVÉ</div>
+        <h2 style="margin-bottom:5px;">Mes rendez-vous</h2>
+        <div class="muted">Réservations, confirmations et indisponibilités.</div>
+      </div>
+      <a class="btn secondary" href="{{ url_for('index') }}">Voir le site</a>
+    </div>
+  </div>
+
+  <div class="card" style="max-width:none;margin-bottom:24px;">
+    <h2>Bloquer une disponibilité</h2>
+
+    <form method="post" action="{{ url_for('admin_block') }}">
+      <div class="grid">
+        <label>
+          Début
+          <input type="datetime-local" name="start_dt" required>
+        </label>
+
+        <label>
+          Fin
+          <input type="datetime-local" name="end_dt" required>
+        </label>
+      </div>
+
+      <label>
+        Note
+        <input name="note" placeholder="Indisponible, rendez-vous personnel, déplacement...">
+      </label>
+
+      <p>
+        <button class="btn primary">Bloquer le créneau</button>
+      </p>
+    </form>
+  </div>
+
+  <div class="card" style="max-width:none;margin-bottom:24px;">
+    <h2>Réservations</h2>
+
+    {% if bookings %}
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date / heure</th>
+              <th>Client</th>
+              <th>Séance</th>
+              <th>Acompte</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {% for b in bookings %}
+            <tr>
+              <td>
+                <strong>{{ b.start_dt.replace('T',' ') }}</strong>
+                <br>
+                <span class="muted">Réservation #{{ b.id }}</span>
+              </td>
+
+              <td>
+                <strong>{{ b.pseudo }}</strong>
+                <br>{{ b.email }}
+                {% if b.twitter %}
+                  <br>{{ b.twitter }}
+                {% endif %}
+                <br>
+                <span class="muted">{{ b.age }} ans</span>
+              </td>
+
+              <td>
+                <strong>{{ b.duration_minutes }} min</strong>
+                <br>
+                <span class="muted">{{ b.price }} € au total</span>
+              </td>
+
+              <td>
+                <strong>{{ b.deposit }} €</strong>
+                <br>
+                <span class="muted">{{ b.payment_method }}</span>
+              </td>
+
+              <td>
+                {% if b.status == 'confirmed' %}
+                  <span class="status" style="border-color:#8b7449;color:#e0c58f;">Confirmé</span>
+                {% elif b.status == 'cancelled' %}
+                  <span class="status" style="border-color:#71313d;color:#e6a2af;">Annulé</span>
+                {% else %}
+                  <span class="status">En attente</span>
+                {% endif %}
+              </td>
+
+              <td>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  {% if b.status != 'confirmed' %}
+                    <form method="post"
+                          action="{{ url_for('admin_booking_action', booking_id=b.id, action='confirm') }}">
+                      <button class="btn primary">Confirmer</button>
+                    </form>
+                  {% endif %}
+
+                  {% if b.status != 'cancelled' %}
+                    <form method="post"
+                          action="{{ url_for('admin_booking_action', booking_id=b.id, action='cancel') }}">
+                      <button class="btn danger">Annuler</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Aucune réservation pour le moment.</p>
+    {% endif %}
+  </div>
+
+  <div class="card" style="max-width:none;">
+    <h2>Créneaux bloqués</h2>
+
+    {% if blocks %}
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Note</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {% for x in blocks %}
+            <tr>
+              <td>{{ x.start_dt.replace('T',' ') }}</td>
+              <td>{{ x.end_dt.replace('T',' ') }}</td>
+              <td>{{ x.note or 'Indisponible' }}</td>
+              <td>
+                <form method="post"
+                      action="{{ url_for('delete_block', block_id=x.id) }}">
+                  <button class="btn danger">Supprimer</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">Aucun créneau bloqué.</p>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>
