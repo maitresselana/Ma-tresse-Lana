@@ -1,4 +1,4 @@
-const CACHE_NAME = "admin-lana-v3";
+const CACHE_NAME = "admin-lana-v4";
 
 const APP_SHELL = [
   "/admin",
@@ -68,7 +68,8 @@ self.addEventListener("push", (event) => {
     body: "Nouvelle réservation",
     url: "/admin",
     icon: "/static/admin-icon-192.png",
-    badge: "/static/admin-icon-192.png"
+    badge: "/static/admin-icon-192.png",
+    badgeCount: 1
   };
 
   if (event.data) {
@@ -82,24 +83,28 @@ self.addEventListener("push", (event) => {
     }
   }
 
-  event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(data.title, {
-        body: data.body,
-        icon: data.icon,
-        badge: data.badge,
-        data: {
-          url: data.url
-        },
-        tag: "nouvelle-reservation",
-        renotify: true
-      }),
+  const tasks = [
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: data.badge,
+      data: {
+        url: data.url
+      },
+      tag: "nouvelle-reservation",
+      renotify: true
+    })
+  ];
 
-      self.registration.setAppBadge
-        ? self.registration.setAppBadge(1)
-        : Promise.resolve()
-    ])
-  );
+  if ("setAppBadge" in self.navigator) {
+    tasks.push(
+      self.navigator.setAppBadge(
+        Number(data.badgeCount) || 1
+      )
+    );
+  }
+
+  event.waitUntil(Promise.all(tasks));
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -109,34 +114,38 @@ self.addEventListener("notificationclick", (event) => {
     event.notification.data?.url || "/admin";
 
   event.waitUntil(
-    Promise.all([
-      self.registration.clearAppBadge
-        ? self.registration.clearAppBadge()
-        : Promise.resolve(),
-
-      clients
-        .matchAll({
-          type: "window",
-          includeUncontrolled: true
-        })
-        .then((clientList) => {
-          for (const client of clientList) {
-            if ("focus" in client) {
-              client.navigate(targetUrl);
-              return client.focus();
-            }
+    clients
+      .matchAll({
+        type: "window",
+        includeUncontrolled: true
+      })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if ("focus" in client) {
+            client.navigate(targetUrl);
+            return client.focus();
           }
+        }
 
-          return clients.openWindow(targetUrl);
-        })
-    ])
+        return clients.openWindow(targetUrl);
+      })
   );
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "CLEAR_BADGE") {
-    if (self.registration.clearAppBadge) {
-      self.registration.clearAppBadge();
-    }
+  if (
+    event.data?.type === "SET_BADGE" &&
+    "setAppBadge" in self.navigator
+  ) {
+    self.navigator.setAppBadge(
+      Number(event.data.count) || 0
+    );
+  }
+
+  if (
+    event.data?.type === "CLEAR_BADGE" &&
+    "clearAppBadge" in self.navigator
+  ) {
+    self.navigator.clearAppBadge();
   }
 });
