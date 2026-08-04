@@ -1,0 +1,20 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin avis — Maîtresse Lana</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+body{margin:0;background:#09090c;color:#f7f2ea}.shell{width:min(1050px,100%);margin:auto;padding:30px 18px 70px}
+.top,.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}h1{font:500 clamp(2.5rem,7vw,4.5rem) Georgia,serif;color:#efd49a}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.stat,.card{padding:19px;border:1px solid #312d35;border-radius:18px;background:#15151a}.stat strong{display:block;font-size:2rem}
+.list{display:grid;gap:14px}.stars{color:#e2bd70}.meta{color:#aaa1a7}.comment{white-space:pre-wrap;line-height:1.65}.actions{justify-content:flex-start;margin-top:15px}.danger{color:#f4afbc!important}.flash{padding:14px;border:1px solid #493f32;border-radius:14px;margin-bottom:15px;color:#efd49a}
+@media(max-width:680px){.stats{grid-template-columns:1fr}.actions form,.actions .btn{width:100%}}
+</style></head><body><main class="shell">
+{% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}{% endwith %}
+<div class="top"><h1>Gestion des avis</h1><div><a class="btn secondary" href="{{url_for('admin')}}">Réservations</a> <a class="btn secondary" href="{{url_for('avis')}}">Page publique</a></div></div>
+<section class="stats"><div class="stat"><strong>{{counts.pending}}</strong>En attente</div><div class="stat"><strong>{{counts.published}}</strong>Publiés</div><div class="stat"><strong>{{counts.rejected}}</strong>Refusés</div></section>
+<section class="list">{% for r in reviews %}<article class="card"><div class="stars">{{'★'*r.rating}}{{'☆'*(5-r.rating)}}</div><h2>{{r.pseudo}}{% if r.verified %} — Client vérifié{% endif %}</h2><p class="meta">#{{r.id}} · {{r.created_at.replace('T',' ')}} · {{r.email or 'Sans e-mail'}} · {{r.status}}</p><div class="comment">{{r.comment}}</div>
+<div class="actions">
+{% if r.status != 'published' %}<form method="post" action="{{url_for('admin_review_action',review_id=r.id,action='publish')}}"><button class="btn primary">Publier</button></form>{% endif %}
+{% if r.status != 'rejected' %}<form method="post" action="{{url_for('admin_review_action',review_id=r.id,action='reject')}}"><button class="btn danger">Refuser</button></form>{% endif %}
+<form method="post" action="{{url_for('admin_review_action',review_id=r.id,action='verify' if not r.verified else 'unverify')}}"><button class="btn secondary">{{'Client vérifié' if not r.verified else 'Retirer le badge'}}</button></form>
+<form method="post" action="{{url_for('admin_review_action',review_id=r.id,action='delete')}}" onsubmit="return confirm('Supprimer cet avis ?')"><button class="btn danger">Supprimer</button></form>
+</div></article>{% else %}<div class="card">Aucun avis reçu.</div>{% endfor %}</section>
+</main></body></html>
