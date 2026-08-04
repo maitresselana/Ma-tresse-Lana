@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tableau de bord privé — Maîtresse Lana</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    :root{
+      --bg:#09090c;--panel:#141419;--panel2:#1a1a20;--line:#312d35;
+      --text:#f7f2ea;--muted:#aaa1a7;--gold:#d7b46c;--gold2:#efd49a;
+      --red:#ef9faf;--blue:#afc2ec;--green:#9fd2ad;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Arial,Helvetica,sans-serif;
+      background:radial-gradient(circle at 90% 0%,rgba(95,24,44,.23),transparent 25%),
+      linear-gradient(180deg,#08080a,#0d0d11 55%,#09090b)}
+    a{text-decoration:none}
+    .topbar{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+      gap:14px;padding:14px 5vw;border-bottom:1px solid var(--line);background:rgba(9,9,12,.93);
+      backdrop-filter:blur(16px)}
+    .brand{font-family:Georgia,"Times New Roman",serif;color:var(--gold2);letter-spacing:.08em;
+      text-transform:uppercase;font-size:clamp(1rem,2.8vw,1.45rem)}
+    .actions-top,.actions,.filters{display:flex;gap:9px;flex-wrap:wrap}
+    .btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:42px;
+      padding:10px 16px;border:1px solid rgba(215,180,108,.45);border-radius:999px;color:var(--gold2);
+      background:transparent;font:inherit;font-weight:800;cursor:pointer}
+    .btn.primary{border:0;color:#181208;background:linear-gradient(135deg,var(--gold2),#c7a35c)}
+    .btn.danger{border-color:rgba(239,159,175,.5);color:#f4afbc;background:rgba(98,27,45,.13)}
+    .shell{width:min(1200px,100%);margin:auto;padding:34px 5vw 80px}
+    .admin-hero{margin:0 0 24px;padding:0;border:0;background:none;box-shadow:none;max-width:none;width:100%}.kicker{margin:0 0 6px;color:var(--gold);font-size:.75rem;font-weight:900;
+      letter-spacing:.22em;text-transform:uppercase}.admin-hero h1{padding:0;text-align:left;margin:0;font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2.6rem,7vw,5rem);font-weight:500;line-height:.95}
+    .admin-hero p{padding:0;text-align:left;max-width:680px;margin:13px 0 0;color:var(--muted);line-height:1.7}
+    .flash{margin-bottom:16px;padding:14px 17px;border:1px solid rgba(215,180,108,.35);
+      border-radius:15px;color:var(--gold2);background:#171318}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}
+    .business-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px;margin-bottom:24px}
+    .business-stat{padding:18px;border:1px solid rgba(215,180,108,.22);border-radius:18px;background:linear-gradient(145deg,#17171c,#111115)}
+    .business-stat strong{display:block;font:500 1.75rem Georgia,"Times New Roman",serif;color:var(--gold2)}
+    .business-stat span{display:block;margin-top:4px;color:var(--muted);font-size:.82rem;line-height:1.35}
+    .quick-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:22px}
+    .quick-card{padding:21px;border:1px solid var(--line);border-radius:20px;background:rgba(20,20,25,.97)}
+    .quick-card h2{margin:0 0 14px;font:500 1.75rem Georgia,"Times New Roman",serif}
+    .upcoming-list{display:grid;gap:10px}
+    .upcoming-item{display:flex;justify-content:space-between;gap:12px;padding:13px;border:1px solid rgba(255,255,255,.06);border-radius:13px;background:#101014}
+    .upcoming-item strong{display:block}.upcoming-item span{color:var(--muted);font-size:.86rem}
+    .quick-actions{display:grid;gap:10px}.quick-actions .btn{width:100%}
+    .stat{padding:20px;border:1px solid var(--line);border-radius:19px;background:rgba(20,20,25,.96);
+      box-shadow:0 18px 42px rgba(0,0,0,.2)}
+    .stat strong{display:block;font:500 2rem Georgia,"Times New Roman",serif}.stat span{color:var(--muted)}
+    .panel{padding:23px;border:1px solid var(--line);border-radius:23px;background:rgba(20,20,25,.97);
+      box-shadow:0 24px 60px rgba(0,0,0,.24);margin-bottom:22px}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px}
+    .panel-head h2{margin:0;font:500 clamp(1.8rem,4vw,2.5rem) Georgia,"Times New Roman",serif}
+    .muted{color:var(--muted)}
+    .toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .search{display:flex;gap:8px;flex:1;min-width:240px}.search input{flex:1;min-width:0;padding:12px 14px;
+      border:1px solid #3a353d;border-radius:999px;color:var(--text);background:#0e0e12;font:inherit}
+    .filter{padding:9px 13px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+    .filter.active{color:#171107;border-color:transparent;background:var(--gold2);font-weight:800}
+    .calendar-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .calendar-controls h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1.45rem}
+    .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+    .weekday{text-align:center;color:var(--muted);font-size:.8rem;font-weight:800;padding:7px}
+    .day{min-height:105px;padding:9px;border:1px solid var(--line);border-radius:14px;background:#101014}
+    .day.outside{opacity:.35}.day.today{border-color:var(--gold)}
+    .day-number{font-weight:900;margin-bottom:7px}.event{display:block;width:100%;margin:4px 0;padding:5px 7px;border:0;text-align:left;cursor:pointer;
+      border-radius:8px;font-size:.72rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .event.pending{color:var(--blue);background:rgba(77,103,160,.18)}
+    .event.confirmed{color:var(--gold2);background:rgba(143,108,38,.2)}
+    .event.block{color:var(--red);background:rgba(126,37,57,.2)}
+    .layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);gap:22px;align-items:start}
+    .bookings,.blocks{display:grid;gap:14px}
+    .booking,.block{padding:19px;border:1px solid var(--line);border-radius:19px;background:var(--panel2)}
+    .booking.pending{border-color:rgba(175,194,236,.34)}.booking.confirmed{border-color:rgba(215,180,108,.45)}
+    .booking-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
+    .date{margin:0;font-size:1.08rem;font-weight:900}.id{margin-top:4px;color:var(--muted);font-size:.84rem}
+    .status{display:inline-flex;padding:7px 11px;border-radius:999px;font-size:.8rem;font-weight:800}
+    .status.pending{color:var(--blue);border:1px solid rgba(175,194,236,.45)}
+    .status.confirmed{color:var(--gold2);border:1px solid rgba(215,180,108,.5)}
+    .status.cancelled{color:var(--red);border:1px solid rgba(239,159,175,.5)}
+    .details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:15px}
+    .detail{padding:12px;border:1px solid rgba(255,255,255,.055);border-radius:13px;background:#111115;min-width:0}
+    .label{display:block;margin-bottom:4px;color:var(--muted);font-size:.72rem;font-weight:800;
+      letter-spacing:.08em;text-transform:uppercase}.value{display:block;line-height:1.45;overflow-wrap:anywhere}
+    .message{margin:0 0 15px;padding:12px 14px;border-left:2px solid var(--gold);border-radius:0 11px 11px 0;
+      color:#d7ced3;background:#111115;line-height:1.55}
+    form{margin:0}.block-form label{display:block;margin-bottom:13px;font-weight:800}
+    .block-form input{width:100%;margin-top:7px;padding:13px 14px;border:1px solid #39343c;border-radius:13px;
+      color:var(--text);background:#0e0e12;font:inherit}
+    .target-flash{outline:2px solid var(--gold);box-shadow:0 0 0 5px rgba(215,180,108,.13);transition:.2s}
+.empty{padding:30px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+    @media(max-width:1050px){.business-stats{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:950px){.stats{grid-template-columns:repeat(2,1fr)}.business-stats{grid-template-columns:repeat(2,1fr)}.quick-grid,.layout{grid-template-columns:1fr}}
+    @media(max-width:680px){
+      .topbar{align-items:flex-start;flex-direction:column}.actions-top,.btn,.actions,.actions form{width:100%}
+      .shell{padding:22px 12px 58px}.stats,.business-stats{grid-template-columns:1fr}.panel{padding:17px;border-radius:18px}
+      .details{grid-template-columns:1fr}.booking-top{flex-direction:column}.calendar{gap:3px}
+      .day{min-height:75px;padding:5px;border-radius:9px}.weekday{font-size:.68rem;padding:4px}
+      .event{font-size:.62rem;padding:3px 4px}.calendar-controls{align-items:flex-start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Planning privé — Maîtresse Lana</div>
+    <div class="actions-top">
+      <a class="btn" href="{{ url_for('admin_reviews') }}">Avis</a>
+      <a class="btn" href="{{ url_for('index') }}">Voir le site</a>
+      <a class="btn danger" href="{{ url_for('logout') }}">Déconnexion</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    {% with messages=get_flashed_messages() %}
+      {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+    {% endwith %}
+
+    <section class="admin-hero">
+      <p class="kicker">Espace privé</p>
+      <h1>Tableau de bord</h1>
+      <p>Réservations, calendrier, recherche et indisponibilités réunis au même endroit.</p>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><strong>{{ counts.pending }}</strong><span>En attente</span></div>
+      <div class="stat"><strong>{{ counts.confirmed }}</strong><span>Confirmées</span></div>
+      <div class="stat"><strong>{{ counts.cancelled }}</strong><span>Refusées</span></div>
+      <div class="stat"><strong>{{ counts.blocks }}</strong><span>Créneaux bloqués</span></div>
+    </section>
+
+    <section class="business-stats">
+      <div class="business-stat"><strong>{{ dashboard.month_confirmed }}</strong><span>Rendez-vous confirmés ce mois</span></div>
+      <div class="business-stat"><strong>{{ dashboard.month_revenue }} €</strong><span>Chiffre d’affaires prévu ce mois</span></div>
+      <div class="business-stat"><strong>{{ dashboard.upcoming_week }}</strong><span>Rendez-vous dans les 7 prochains jours</span></div>
+      <div class="business-stat"><strong>{{ dashboard.reviews_pending }}</strong><span>Avis en attente de validation</span></div>
+      <div class="business-stat"><strong>{{ dashboard.review_requests_sent }}</strong><span>Demandes d’avis envoyées</span></div>
+    </section>
+
+    <section class="quick-grid">
+      <div class="quick-card">
+        <h2>Prochains rendez-vous</h2>
+        {% if upcoming_bookings %}
+          <div class="upcoming-list">
+            {% for b in upcoming_bookings %}
+              <div class="upcoming-item">
+                <div><strong>{{ b.pseudo }}</strong><span>{{ b.duration_minutes }} min · {{ b.price }} €</span></div>
+                <div style="text-align:right"><strong>{{ b.start_dt.replace('T',' ') }}</strong><span>Confirmé</span></div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">Aucun rendez-vous confirmé à venir.</div>
+        {% endif %}
+      </div>
+      <div class="quick-card">
+        <h2>Accès rapides</h2>
+        <div class="quick-actions">
+          <a class="btn primary" href="{{ url_for('admin_reviews') }}">Gérer les avis</a>
+          <a class="btn" href="{{ url_for('avis') }}">Voir les avis publics</a>
+          <a class="btn" href="{{ url_for('index') }}">Voir le site</a>
+        </div>
+        <p class="muted" style="margin:16px 0 0;line-height:1.55">Les demandes d’avis sont envoyées trois jours après une séance confirmée, lors de l’ouverture du tableau de bord.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Calendrier</h2><span class="muted">Réservations actives et indisponibilités</span></div>
+      <div class="calendar-controls">
+        <button class="btn" id="prevMonth" type="button">Mois précédent</button>
+        <h3 id="calendarTitle"></h3>
+        <button class="btn" id="nextMonth" type="button">Mois suivant</button>
+      </div>
+      <div class="calendar" id="calendar"></div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head"><h2>Réservations</h2><span class="muted">{{ bookings|length }} affichée(s)</span></div>
+
+        <div class="toolbar">
+          <form class="search" method="get" action="{{ url_for('admin') }}">
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            <input name="q" value="{{ search_query }}" placeholder="Rechercher un pseudo, email ou compte X">
+            <button class="btn primary" type="submit">Rechercher</button>
+          </form>
+          <div class="filters">
+            {% for key,label in [('active','Actives'),('pending','En attente'),('confirmed','Confirmées'),('cancelled','Refusées'),('all','Toutes')] %}
+              <a class="filter {% if status_filter == key %}active{% endif %}"
+                 href="{{ url_for('admin', status=key, q=search_query) }}">{{ label }}</a>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if bookings %}
+          <div class="bookings">
+            {% for b in bookings %}
+              <article id="booking-{{ b.id }}" class="booking {{ b.status }}">
+                <div class="booking-top">
+                  <div>
+                    <p class="date">{{ b.start_dt.replace('T',' ') }}</p>
+                    <div class="id">Réservation #{{ b.id }}</div>
+                  </div>
+                  <span class="status {{ b.status }}">
+                    {% if b.status == 'confirmed' %}Confirmée{% elif b.status == 'cancelled' %}Refusée{% else %}En attente{% endif %}
+                  </span>
+                </div>
+
+                <div class="details">
+                  <div class="detail"><span class="label">Client</span><span class="value"><strong>{{ b.pseudo }}</strong><br>{{ b.email }}{% if b.twitter %}<br>{{ b.twitter }}{% endif %}</span></div>
+                  <div class="detail"><span class="label">Séance</span><span class="value"><strong>{{ b.duration_minutes }} min</strong><br>{{ b.price }} € au total</span></div>
+                  <div class="detail"><span class="label">Acompte</span><span class="value"><strong>{{ b.deposit }} €</strong><br>{{ b.payment_method or 'Non précisé' }}</span></div>
+                  <div class="detail"><span class="label">Âge</span><span class="value">{{ b.age }} ans</span></div>
+                </div>
+
+                {% if b.message %}<p class="message">{{ b.message }}</p>{% endif %}
+
+                <div class="actions">
+                  {% if b.status != 'confirmed' and b.status != 'cancelled' %}
+                    <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='confirm') }}">
+                      <button class="btn primary" type="submit">Confirmer</button>
+                    </form>
+                  {% endif %}
+                  {% if b.status != 'cancelled' %}
+                    <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='cancel') }}">
+                      <button class="btn danger" type="submit">{% if b.status == 'confirmed' %}Annuler le rendez-vous{% else %}Refuser{% endif %}</button>
+                    </form>
+                  {% endif %}
+                  <form method="post" action="{{ url_for('delete_booking', booking_id=b.id) }}"
+                        onsubmit="return confirm('Supprimer définitivement la réservation #{{ b.id }} ? Cette action est irréversible.');">
+                    <button class="btn danger" type="submit">Supprimer définitivement</button>
+                  </form>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">Aucune réservation ne correspond à ce filtre.</div>
+        {% endif %}
+      </section>
+
+      <aside>
+        <section class="panel">
+          <div class="panel-head"><h2>Bloquer un créneau</h2></div>
+          <form class="block-form" method="post" action="{{ url_for('admin_block') }}">
+            <label>Début<input type="datetime-local" name="start_dt" required></label>
+            <label>Fin<input type="datetime-local" name="end_dt" required></label>
+            <label>Note<input name="note" placeholder="Indisponible, déplacement..."></label>
+            <button class="btn primary" type="submit">Bloquer le créneau</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Indisponibilités</h2><span class="muted">{{ blocks|length }}</span></div>
+          {% if blocks %}
+            <div class="blocks">
+              {% for x in blocks %}
+                <article id="block-{{ x.id }}" class="block">
+                  <strong>{{ x.start_dt.replace('T',' ') }}</strong>
+                  <p class="muted">Jusqu’au {{ x.end_dt.replace('T',' ') }}<br>{{ x.note or 'Indisponible' }}</p>
+                  <form method="post" action="{{ url_for('delete_block', block_id=x.id) }}">
+                    <button class="btn danger" type="submit">Supprimer</button>
+                  </form>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty">Aucun créneau bloqué.</div>
+          {% endif %}
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const bookingEvents = {{ calendar_bookings|tojson }};
+    const blockEvents = {{ calendar_blocks|tojson }};
+    let shownMonth = new Date();
+    shownMonth.setDate(1);
+
+    const monthNames = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+    const weekdays = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+    function localDateKey(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,"0");
+      const d = String(date.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function timeFromIso(value){
+      return value.slice(11,16);
+    }
+
+    function renderCalendar(){
+      const root = document.getElementById("calendar");
+      root.innerHTML = "";
+      document.getElementById("calendarTitle").textContent =
+        `${monthNames[shownMonth.getMonth()]} ${shownMonth.getFullYear()}`;
+
+      weekdays.forEach(name=>{
+        const el=document.createElement("div");
+        el.className="weekday";
+        el.textContent=name;
+        root.appendChild(el);
+      });
+
+      const first = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), 1);
+      const offset = (first.getDay()+6)%7;
+      const gridStart = new Date(first);
+      gridStart.setDate(first.getDate()-offset);
+      const todayKey = localDateKey(new Date());
+
+      for(let i=0;i<42;i++){
+        const date = new Date(gridStart);
+        date.setDate(gridStart.getDate()+i);
+        const key = localDateKey(date);
+        const cell=document.createElement("div");
+        cell.className="day";
+        if(date.getMonth()!==shownMonth.getMonth()) cell.classList.add("outside");
+        if(key===todayKey) cell.classList.add("today");
+
+        const number=document.createElement("div");
+        number.className="day-number";
+        number.textContent=date.getDate();
+        cell.appendChild(number);
+
+        bookingEvents.filter(e=>e.start.slice(0,10)===key).forEach(e=>{
+          const item=document.createElement("button");
+          item.type="button";
+          item.className=`event ${e.status}`;
+          item.textContent=`${timeFromIso(e.start)} ${e.title}`;
+          item.title=`Ouvrir la réservation #${e.id} — ${e.title}`;
+          item.addEventListener("click",()=>{
+            const target=document.getElementById(`booking-${e.id}`);
+            if(target){
+              target.scrollIntoView({behavior:"smooth",block:"center"});
+              target.classList.add("target-flash");
+              setTimeout(()=>target.classList.remove("target-flash"),1800);
+            }
+          });
+          cell.appendChild(item);
+        });
+
+        blockEvents.filter(e=>e.start.slice(0,10)===key).forEach(e=>{
+          const item=document.createElement("button");
+          item.type="button";
+          item.className="event block";
+          item.textContent=`${timeFromIso(e.start)} ${e.title}`;
+          item.title=`Ouvrir l’indisponibilité — ${e.title}`;
+          item.addEventListener("click",()=>{
+            const target=document.getElementById(`block-${e.id}`);
+            if(target){
+              target.scrollIntoView({behavior:"smooth",block:"center"});
+              target.classList.add("target-flash");
+              setTimeout(()=>target.classList.remove("target-flash"),1800);
+            }
+          });
+          cell.appendChild(item);
+        });
+
+        root.appendChild(cell);
+      }
+    }
+
+    document.getElementById("prevMonth").addEventListener("click",()=>{
+      shownMonth.setMonth(shownMonth.getMonth()-1);
+      renderCalendar();
+    });
+    document.getElementById("nextMonth").addEventListener("click",()=>{
+      shownMonth.setMonth(shownMonth.getMonth()+1);
+      renderCalendar();
+    });
+    renderCalendar();
+  </script>
+</body>
+</html>
