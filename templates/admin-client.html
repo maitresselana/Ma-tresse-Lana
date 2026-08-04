@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ client.pseudo }} — Client</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body{margin:0;background:#09090c;color:#f7f2ea;font-family:Arial,Helvetica,sans-serif}
+    .shell{width:min(1050px,100%);margin:auto;padding:30px 18px 70px}
+    .top{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    h1{margin:0;font:500 clamp(2.5rem,7vw,4.5rem) Georgia,serif;color:#efd49a}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+    .stat,.panel,.item{padding:18px;border:1px solid #312d35;border-radius:18px;background:#15151a}
+    .stat strong{display:block;font-size:1.65rem}.muted{color:#aaa1a7}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.list{display:grid;gap:10px}
+    .item{background:#101014}.item h3{margin:0 0 7px}.status{font-weight:800;color:#efd49a}
+    textarea{width:100%;min-height:160px;padding:13px;border:1px solid #3b363e;border-radius:13px;background:#0e0e12;color:#fff;font-size:16px}
+    @media(max-width:800px){.stats,.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="top">
+    <div><div class="muted">FICHE CLIENT</div><h1>{{ client.pseudo }}</h1><div class="muted">{{ client.email }}{% if client.twitter %} · {{ client.twitter }}{% endif %}</div></div>
+    <a class="btn secondary" href="{{ url_for('admin_clients') }}">Retour aux clients</a>
+  </div>
+
+  <section class="stats">
+    <div class="stat"><strong>{{ client.total_bookings }}</strong><span class="muted">réservations</span></div>
+    <div class="stat"><strong>{{ client.confirmed_bookings }}</strong><span class="muted">confirmées</span></div>
+    <div class="stat"><strong>{{ client.total_spent }} €</strong><span class="muted">total confirmé</span></div>
+    <div class="stat"><strong>{{ client.last_booking.replace('T',' ') }}</strong><span class="muted">dernière date</span></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Historique des réservations</h2>
+      <div class="list">
+        {% for b in bookings %}
+          <article class="item">
+            <h3>{{ b.start_dt.replace('T',' ') }} — {{ b.duration_minutes }} min</h3>
+            <div>{{ b.price }} € · {{ b.payment_method or 'Paiement non précisé' }}</div>
+            <div class="status">{{ b.status }}</div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <h2>Note privée</h2>
+        <form method="post" action="{{ url_for('admin_client_note', email=client.email) }}">
+          <textarea name="note" placeholder="Préférences, informations utiles, suivi...">{{ note }}</textarea>
+          <button class="btn primary" style="margin-top:10px">Enregistrer</button>
+        </form>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>Avis laissés</h2>
+        <div class="list">
+          {% for r in reviews %}
+            <article class="item">
+              <div style="color:#e2bd70">{{ '★' * r.rating }}{{ '☆' * (5-r.rating) }}</div>
+              <p>{{ r.comment }}</p>
+              <div class="muted">{{ r.status }}</div>
+            </article>
+          {% else %}
+            <div class="muted">Aucun avis associé à cet e-mail.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>
