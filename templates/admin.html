@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Admin Lana</title>
+  <meta name="theme-color" content="#09090c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Admin Lana">
+  <link rel="manifest" href="{{ url_for('static', filename='admin-manifest.json') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='admin-icon-192.png') }}">
+  <style>
+    :root{--bg:#08080b;--panel:#151319;--panel2:#0f0e13;--line:#39313b;--gold:#edcf8e;--gold2:#cda95f;--text:#f8f2e9;--muted:#aaa0a7;--red:#ee9aaa;--green:#9fd2ad;--blue:#aebde7}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}button,input,textarea{font:inherit}a{text-decoration:none;color:inherit}
+    body{background:radial-gradient(circle at 90% 0,rgba(115,36,60,.22),transparent 30%),linear-gradient(180deg,#08080a,#0d0b10)}
+    .app{width:100%;max-width:1480px;margin:auto;min-height:100vh;padding-bottom:94px}
+    .top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid rgba(237,207,142,.16);background:rgba(8,8,11,.88);backdrop-filter:blur(18px)}
+    .brand{font-family:Georgia,serif;color:var(--gold);letter-spacing:.11em;font-size:clamp(.9rem,3.8vw,1.2rem);white-space:nowrap}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{width:42px;height:42px;border:1px solid rgba(237,207,142,.35);border-radius:14px;background:#111015;color:var(--gold);display:grid;place-items:center;cursor:pointer}.push-dot{width:9px;height:9px;border-radius:50%;background:#777}.push-dot.on{background:#66d18b;box-shadow:0 0 0 4px rgba(102,209,139,.12)}
+    .screen{display:none;width:100%;max-width:1180px;margin:0 auto;padding:18px 14px 28px}.screen.active{display:block;animation:fade .18s ease}@keyframes fade{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .hero{padding:23px;border:1px solid rgba(237,207,142,.25);border-radius:26px;background:linear-gradient(145deg,rgba(38,29,35,.94),rgba(15,14,19,.96));box-shadow:0 22px 55px rgba(0,0,0,.3);margin-bottom:16px}.eyebrow{margin:0 0 7px;color:var(--gold2);font-size:.72rem;letter-spacing:.2em;font-weight:900;text-transform:uppercase}.hero h1{margin:0;font:500 clamp(2.3rem,10vw,4rem) Georgia,serif;line-height:1}.hero p{margin:12px 0 0;color:var(--muted);line-height:1.55}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.metric{padding:17px 14px;border:1px solid var(--line);border-radius:20px;background:rgba(20,18,24,.94)}.metric strong{display:block;font:500 clamp(1.45rem,6vw,2.2rem) Georgia,serif;color:var(--gold)}.metric span{display:block;margin-top:5px;color:var(--muted);font-size:.78rem}
+    .section{margin-bottom:17px;padding:17px;border:1px solid var(--line);border-radius:23px;background:rgba(19,17,22,.96)}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.section h2{margin:0;font:500 clamp(1.55rem,6vw,2.2rem) Georgia,serif}.count{padding:5px 9px;border-radius:999px;background:rgba(238,154,170,.14);color:var(--red);font-weight:900;font-size:.78rem}
+    .list{display:grid;gap:11px}.booking{padding:16px;border:1px solid #332d35;border-radius:18px;background:#101014}.booking.pending{border-color:rgba(237,207,142,.5);box-shadow:0 0 0 1px rgba(237,207,142,.08)}.booking-top{display:flex;justify-content:space-between;gap:12px}.booking h3{margin:0 0 5px;font:500 1.35rem Georgia,serif}.sub{color:var(--muted);font-size:.87rem;line-height:1.45}.price{color:var(--gold);font-weight:900;white-space:nowrap}.status{display:inline-flex;margin-top:10px;padding:6px 9px;border-radius:999px;font-size:.72rem;font-weight:900}.status.pending{color:var(--blue);border:1px solid rgba(174,189,231,.45)}.status.confirmed{color:var(--gold);border:1px solid rgba(237,207,142,.45)}.status.cancelled{color:var(--red);border:1px solid rgba(238,154,170,.45)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btn{appearance:none;border:1px solid rgba(237,207,142,.4);border-radius:999px;padding:10px 14px;background:transparent;color:var(--gold);font-weight:900;cursor:pointer}.btn.primary{border:0;background:linear-gradient(135deg,var(--gold),#bd9450);color:#181208}.btn.danger{border-color:rgba(238,154,170,.45);color:var(--red);background:rgba(95,28,44,.12)}.btn.full{width:100%}
+    .toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:5px;margin-bottom:13px}.chip{flex:none;border:1px solid var(--line);border-radius:999px;padding:9px 13px;color:var(--muted)}.chip.active{background:var(--gold);color:#171108;border-color:transparent;font-weight:900}
+    .calendar-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.calendar-controls h3{margin:0;font:500 1.3rem Georgia,serif}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;color:var(--muted);font-size:.7rem;padding:5px}.day{min-height:74px;padding:6px;border:1px solid var(--line);border-radius:11px;background:#0e0d12;overflow:hidden}.day.today{border-color:var(--gold)}.day.outside{opacity:.3}.day-num{font-weight:900;font-size:.78rem}.event{display:block;width:100%;margin-top:4px;padding:3px 4px;border:0;border-radius:6px;text-align:left;font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.event.pending{color:var(--blue);background:rgba(75,99,155,.22)}.event.confirmed{color:var(--gold);background:rgba(137,102,36,.22)}.event.block{color:var(--red);background:rgba(118,35,53,.24)}
+    .forms{display:grid;gap:12px;min-width:0}.form-card{width:100%;min-width:0;overflow:hidden;padding:16px;border:1px solid var(--line);border-radius:19px;background:#101014}.form-card h3{margin:0 0 13px;font:500 1.35rem Georgia,serif}.form-card label{display:block;margin-bottom:11px;font-weight:800}.form-card input,.form-card textarea{display:block;width:100%;max-width:100%;min-width:0;margin-top:6px;padding:12px 13px;border:1px solid #39343c;border-radius:12px;background:#0b0b0f;color:#fff;font-size:16px;-webkit-appearance:none;appearance:none}.form-card textarea{min-height:90px;resize:vertical}
+    .client{display:grid;grid-template-columns:1fr auto;gap:10px;padding:15px;border:1px solid var(--line);border-radius:17px;background:#101014}.client h3{margin:0 0 4px}.client .amount{color:var(--gold);font-weight:900}.search{display:flex;gap:8px;margin-bottom:13px}.search input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:999px;background:#0d0c11;color:#fff;font-size:16px}
+    .business-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.business-card{padding:20px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,#17151b,#0e0d12)}.business-card.wide{grid-column:1/-1}.business-card strong{display:block;font:500 clamp(2rem,9vw,3.4rem) Georgia,serif;color:var(--gold)}.business-card span{color:var(--muted)}
+    .settings{display:grid;gap:11px}.setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#101014}.setting strong{display:block}.setting span{display:block;color:var(--muted);font-size:.82rem;margin-top:4px}
+    .empty{padding:24px;text-align:center;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}
+    .flash{margin:14px;padding:13px 15px;border:1px solid rgba(237,207,142,.35);border-radius:15px;background:#171318;color:var(--gold)}
+    .bottom-nav{position:fixed;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:40;display:grid;grid-template-columns:repeat(5,1fr);padding:7px;border:1px solid rgba(237,207,142,.28);border-radius:24px;background:rgba(12,11,15,.94);backdrop-filter:blur(20px);box-shadow:0 16px 45px rgba(0,0,0,.45)}.nav-btn{position:relative;border:0;background:transparent;color:#948b91;padding:7px 2px;border-radius:16px;font-size:.65rem;font-weight:800}.nav-btn b{display:block;font-size:1.18rem;margin-bottom:3px}.nav-btn.active{color:var(--gold);background:rgba(237,207,142,.08)}.badge{position:absolute;top:2px;right:23%;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#d94359;color:#fff;font-size:.62rem;display:grid;place-items:center}
+
+    .attention{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px;margin-bottom:15px;border:1px solid rgba(238,154,170,.35);border-radius:21px;background:linear-gradient(135deg,rgba(91,25,43,.22),rgba(20,17,23,.95))}
+    .attention.ok{border-color:rgba(159,210,173,.28);background:linear-gradient(135deg,rgba(34,87,53,.14),rgba(20,17,23,.95))}
+    .attention strong{display:block;font:500 1.25rem Georgia,serif}.attention span{display:block;margin-top:4px;color:var(--muted);font-size:.84rem;line-height:1.45}
+    .vip{display:inline-flex;margin-top:7px;padding:4px 8px;border:1px solid rgba(237,207,142,.4);border-radius:999px;color:var(--gold);font-size:.66rem;font-weight:900}
+    .loyal{display:inline-flex;margin-top:7px;padding:4px 8px;border:1px solid rgba(159,210,173,.35);border-radius:999px;color:var(--green);font-size:.66rem;font-weight:900}
+    .assistant-card{padding:18px;border:1px solid rgba(237,207,142,.28);border-radius:22px;background:linear-gradient(145deg,#19151b,#0e0d12)}
+    .assistant-card h3{margin:0 0 8px;font:500 1.55rem Georgia,serif}.assistant-card p{margin:0 0 13px;color:var(--muted);line-height:1.5}
+    .assistant-row{display:flex;gap:8px}.assistant-row input{flex:1;min-width:0;padding:13px 14px;border:1px solid var(--line);border-radius:999px;background:#0b0b0f;color:#fff;font-size:16px}
+    .assistant-answer{display:none;margin-top:13px;padding:13px;border:1px solid rgba(237,207,142,.18);border-radius:15px;background:#0d0c11;color:#eee4d8;line-height:1.55}
+    .assistant-answer.show{display:block}
+    .quick-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}.quick-action{padding:15px;border:1px solid var(--line);border-radius:19px;background:#111015;text-align:left}.quick-action b{display:block;color:var(--gold);font-size:1.25rem}.quick-action span{display:block;margin-top:5px;color:var(--muted);font-size:.78rem}
+    .command-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:13px 15px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#17131a,#0f0e13)}
+    .command-strip strong{display:block;font:500 1.25rem Georgia,serif;color:var(--gold)}
+    .command-strip span{display:block;margin-top:3px;color:var(--muted);font-size:.78rem}
+    .mini-push{width:42px;height:42px;border:1px solid rgba(237,207,142,.35);border-radius:50%;background:#111015;color:var(--gold);font-size:1rem}
+    .metric{cursor:pointer;transition:transform .15s ease,border-color .15s ease}.metric:active{transform:scale(.98)}
+    .metric.pending-metric{background:linear-gradient(145deg,rgba(104,75,21,.32),#17120c);border-color:rgba(237,207,142,.5)}
+    .metric.today-metric{background:linear-gradient(145deg,rgba(36,70,112,.28),#10151d);border-color:rgba(146,184,238,.38)}
+    .metric.money-metric{background:linear-gradient(145deg,rgba(35,83,50,.28),#0f1712);border-color:rgba(159,210,173,.42)}
+    .booking-tools{display:grid;gap:10px;margin-top:13px}
+    .booking-tools details{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(8,8,11,.35)}
+    .booking-tools summary{cursor:pointer;padding:12px 13px;font-weight:850;color:#e8d8bb}
+    .booking-tools .tool-body{padding:0 12px 12px}
+    .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .tool-body input,.tool-body select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#0b0b0f;color:#fff;font:inherit}
+    @media(max-width:560px){.tool-grid{grid-template-columns:1fr}}
+    .hero.compact{padding:18px 20px}.hero.compact h1{font-size:clamp(2rem,7vw,3.4rem)}
+    .booking.pending{background:linear-gradient(145deg,rgba(87,65,24,.32),#15120e);border-color:rgba(237,207,142,.5)}
+    .booking.confirmed{background:linear-gradient(145deg,rgba(37,66,105,.25),#10141b);border-color:rgba(146,184,238,.38)}
+    .booking.completed{background:linear-gradient(145deg,rgba(35,83,50,.28),#0f1712);border-color:rgba(159,210,173,.42)}
+    .booking.cancelled{background:linear-gradient(145deg,rgba(93,31,46,.22),#171014);border-color:rgba(238,154,170,.35)}
+    .notes-box{margin-top:13px;padding:14px;border:1px solid rgba(180,148,230,.28);border-radius:16px;background:rgba(78,50,112,.13)}
+    .notes-box h4{margin:0 0 8px;color:#d9c0ff}.notes-box textarea{width:100%;min-height:78px;margin-top:7px;padding:11px;border:1px solid rgba(180,148,230,.25);border-radius:12px;background:#0d0b11;color:#fff;font:inherit}
+    .manual-form{display:grid;gap:11px}.manual-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.manual-form input,.manual-form select,.manual-form textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#0b0b0f;color:#fff;font:inherit}.manual-form textarea{min-height:90px}.manual-form label{color:var(--muted);font-size:.8rem}.manual-form label span{display:block;margin-bottom:6px;color:var(--text);font-weight:800}
+    .pending-jump{cursor:pointer}
+    .status.completed{color:var(--green);border:1px solid rgba(159,210,173,.45)}
+    @media(max-width:560px){.manual-grid{grid-template-columns:1fr}}
+    .reservation-groups{display:grid;gap:17px;margin-top:17px}
+    .reservation-group{padding:17px;border:1px solid var(--line);border-radius:23px;background:rgba(16,15,20,.94)}
+    .reservation-group.future{border-color:rgba(237,207,142,.28)}
+    .reservation-group.history{border-color:rgba(160,153,164,.18);background:rgba(12,12,16,.88)}
+    .reservation-group .section-head{margin-bottom:13px}
+    .reservation-group .section-head p{margin:4px 0 0;color:var(--muted);font-size:.8rem}
+    .history .booking{opacity:.82}
+    .history .booking:hover{opacity:1}
+    .reservation-date{display:inline-flex;margin-bottom:8px;padding:5px 9px;border-radius:999px;background:rgba(237,207,142,.09);color:var(--gold);font-size:.72rem;font-weight:900}
+    .history .reservation-date{background:rgba(255,255,255,.045);color:var(--muted)}
+    .history-details{margin-top:13px}
+    .history-details summary{cursor:pointer;list-style:none;padding:11px 13px;border:1px solid rgba(180,148,230,.24);border-radius:13px;color:#d9c0ff;background:rgba(78,50,112,.10);font-weight:800}
+    .history-details summary::-webkit-details-marker{display:none}
+    .history-details[open] summary{margin-bottom:9px}
+    .history .actions{margin-top:13px}
+    .history .actions form,.history .actions .btn{width:100%}
+    @media(min-width:900px){.reservation-groups{grid-template-columns:1fr 1fr;align-items:start}}
+    @media(max-width:560px){
+      #planning .section{padding-left:14px;padding-right:14px}
+      #planning .forms{width:100%;overflow:hidden}
+      #planning .form-card{margin:0;width:100%}
+      #planning input[type="date"],
+      #planning input[type="datetime-local"]{
+        inline-size:100%;
+        max-inline-size:100%;
+      }
+      #planning{padding-bottom:115px}
+
+      .top{padding-left:12px;padding-right:12px}
+      .screen{padding-left:12px;padding-right:12px}
+      .hero{padding:20px;border-radius:22px}
+      .summary{grid-template-columns:1fr}
+      .metric{padding:15px}
+      .attention{align-items:flex-start}
+      .quick-row{grid-template-columns:1fr}
+      .booking-top{align-items:flex-start}
+      .actions,.actions form,.actions .btn{width:100%}
+      .assistant-row{flex-direction:column}
+      .assistant-row .btn{width:100%}
+      .business-grid{grid-template-columns:1fr}
+      .business-card.wide{grid-column:auto}
+      .search{flex-direction:column}
+      .search .btn{width:100%}
+      .calendar{gap:3px}
+      .day{min-height:66px;padding:4px}
+    }
+
+    @media(min-width:900px){
+      .app{padding-left:116px;padding-bottom:30px}
+      .screen{padding:30px 38px}
+      .home-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
+      .summary{grid-template-columns:repeat(3,1fr)}
+      .forms{grid-template-columns:repeat(3,1fr)}
+      .clients-grid{grid-template-columns:repeat(2,1fr)}
+      .business-grid{grid-template-columns:repeat(4,1fr)}
+      .business-card.wide{grid-column:auto}
+      .bottom-nav{left:16px;right:auto;top:94px;bottom:auto;transform:none;width:88px;display:flex;flex-direction:column;gap:8px;padding:9px;border-radius:25px}
+      .nav-btn{padding:12px 5px}.nav-btn b{font-size:1.35rem}.badge{right:8px}
+      .calendar .day{min-height:116px}.event{font-size:.7rem}
+    }
+    @media(max-width:520px){.summary{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.top-actions .desktop-only{display:none}.hero{padding:20px}.section{padding:14px}.actions form,.actions .btn{flex:1}.actions form .btn{width:100%}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">✦ ADMIN LANA</div>
+    <div class="top-actions">
+      <button class="icon-btn" id="pushButton" type="button" title="Notifications"><span id="pushDot" class="push-dot"></span>🔔</button>
+      <a class="icon-btn desktop-only" href="{{ url_for('index') }}" title="Voir le site">↗</a>
+    </div>
+  </header>
+
+  {% with messages=get_flashed_messages() %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endwith %}
+
+  <section id="home" class="screen active">
+    <div class="command-strip">
+      <div><strong>Admin Lana</strong><span>{{ today_bookings|length }} aujourd’hui · {{ dashboard.today_revenue }} € réalisés</span></div>
+      <button class="mini-push" id="pushButton" type="button">🔔</button>
+    </div>
+<div class="attention pending-jump {% if dashboard.action_count == 0 %}ok{% endif %}" id="pendingJump">
+      <div>
+        <strong>{% if dashboard.action_count %}{{ dashboard.action_count }} action(s) à traiter{% else %}Tout est à jour ✨{% endif %}</strong>
+        <span>{% if dashboard.action_count %}{{ counts.pending }} réservation(s) et {{ dashboard.reviews_pending }} avis en attente{% else %}Aucune demande urgente pour le moment{% endif %}</span>
+      </div>
+      {% if dashboard.action_count %}<span class="count">{{ dashboard.action_count }}</span>{% endif %}
+    </div>
+
+    <div class="summary">
+      <button class="metric pending-metric" id="pendingMetric" type="button"><strong>{{ counts.pending }}</strong><span>À confirmer</span></button>
+      <div class="metric"><strong>{{ dashboard.today_confirmed }}</strong><span>RDV aujourd’hui</span></div>
+      <button class="metric money-metric" id="moneyMetric" type="button"><strong>{{ dashboard.today_revenue }} €</strong><span>Réalisé aujourd’hui</span></button>
+    </div>
+    <div class="quick-row">
+      <button class="quick-action" type="button" data-open="planning"><b>📅 Planning</b><span>Bloquer une journée ou une période</span></button>
+      <button class="quick-action" type="button" data-open="business"><b>💰 Business</b><span>{{ dashboard.month_revenue }} € ce mois-ci</span></button>
+    </div>
+    <div class="home-grid">
+      <section class="section" id="pendingSection">
+        <div class="section-head"><h2>À traiter</h2><span class="count">{{ pending_bookings|length }}</span></div>
+        <div class="list">
+          {% for b in pending_bookings %}
+          <article id="booking-{{ b.id }}" class="booking pending">
+            <div class="booking-top"><div><h3>{{ b.pseudo }}</h3><div class="sub">{{ b.start_dt.replace('T',' ') }} · {{ b.duration_minutes }} min<br>{{ b.email }}</div></div><div class="price">{{ b.price }} €</div></div>
+            <span class="status pending">En attente</span>
+            <div class="actions">
+              <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='confirm') }}"><button class="btn primary">Confirmer</button></form>
+              <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='cancel') }}"><button class="btn danger">Refuser</button></form>
+            </div>
+          </article>
+          {% else %}<div class="empty">Aucune demande en attente.</div>{% endfor %}
+        </div>
+      </section>
+      <section class="section" id="todaySection">
+        <div class="section-head"><div><h2>Les 3 prochains jours</h2><p>Les rendez-vous les plus proches.</p></div><span class="count">{{ soon_bookings|length }}</span></div>
+        <div class="list">
+          {% for b in soon_bookings %}
+          <article class="booking {{ b.status }}">
+            <div class="reservation-date">{{ b.start_dt[:10] }} · {{ b.start_dt[11:16] }}</div>
+            <div class="booking-top"><div><h3>{{ b.pseudo }}</h3><div class="sub">{{ b.duration_minutes }} min · {{ b.payment_method or 'Paiement non précisé' }}</div></div><div class="price">{{ b.price }} €</div></div>
+            <span class="status {{ b.status }}">{% if b.status=='completed' %}Réalisée{% elif b.status=='confirmed' %}Confirmée{% else %}En attente{% endif %}</span>
+          </article>
+          {% else %}<div class="empty">Aucun rendez-vous dans les 3 prochains jours.</div>{% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <div class="reservation-groups">
+      <section class="reservation-group future">
+        <div class="section-head">
+          <div><h2>Réservations futures</h2><p>Après les 3 prochains jours.</p></div>
+          <span class="count">{{ later_bookings|length }}</span>
+        </div>
+        <div class="list">
+          {% for b in later_bookings %}
+          <article id="booking-all-{{ b.id }}" class="booking {{ b.status }}">
+            <div class="reservation-date">{{ b.start_dt[:10] }} · {{ b.start_dt[11:16] }}</div>
+            <div class="booking-top">
+              <div><h3>{{ b.pseudo }}</h3><div class="sub">{{ b.email }}<br>{{ b.duration_minutes }} min · {{ b.payment_method or 'Paiement non précisé' }}</div></div>
+              <div class="price">{{ b.price }} €</div>
+            </div>
+            <span class="status {{ b.status }}">{% if b.status=='completed' %}Réalisée{% elif b.status=='confirmed' %}Confirmée{% elif b.status=='cancelled' %}Refusée{% else %}En attente{% endif %}</span>
+            <div class="notes-box">
+              <h4>Pratiques & notes privées</h4>
+              <form method="post" action="{{ url_for('admin_booking_notes', booking_id=b.id) }}">
+                <label>Pratiques souhaitées<textarea name="practices">{{ b.practices or '' }}</textarea></label>
+                <label>Notes privées<textarea name="private_notes">{{ b.private_notes or '' }}</textarea></label>
+                <button class="btn" type="submit">Enregistrer les notes</button>
+              </form>
+            </div>
+            <div class="actions">
+              {% if b.status == 'pending' %}
+              <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='confirm') }}"><button class="btn primary">Confirmer</button></form>
+              {% endif %}
+              {% if b.status == 'confirmed' %}
+              <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='complete') }}"><button class="btn primary">✓ Marquer réalisé</button></form>
+              {% endif %}
+              {% if b.status not in ('cancelled','completed') %}
+              <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='cancel') }}"><button class="btn danger">Annuler</button></form>
+              {% endif %}
+            </div>            {% if b.status not in ('cancelled','completed') %}
+            <div class="booking-tools">
+              <details>
+                <summary>📅 Déplacer moi-même</summary>
+                <div class="tool-body">
+                  <form method="post" action="{{ url_for('admin_move_booking', booking_id=b.id) }}">
+                    <div class="tool-grid">
+                      <input type="datetime-local" name="start_dt" required>
+                      <label style="display:flex;align-items:center;gap:8px"><input style="width:auto" type="checkbox" name="send_confirmation" value="1" checked> Prévenir par e-mail</label>
+                    </div>
+                    <button class="btn primary" type="submit" style="margin-top:9px">Déplacer</button>
+                  </form>
+                </div>
+              </details>
+              <details>
+                <summary>🔄 Proposer 2 créneaux</summary>
+                <div class="tool-body">
+                  <form method="post" action="{{ url_for('admin_propose_slots', booking_id=b.id) }}">
+                    <div class="tool-grid">
+                      <input type="datetime-local" name="slot1_start" required>
+                      <input type="datetime-local" name="slot2_start" required>
+                      <select name="expires_hours">
+                        <option value="24">Lien valable 24 h</option>
+                        <option value="48" selected>Lien valable 48 h</option>
+                        <option value="72">Lien valable 72 h</option>
+                      </select>
+                    </div>
+                    <button class="btn primary" type="submit" style="margin-top:9px">Envoyer les propositions</button>
+                  </form>
+                </div>
+              </details>
+            </div>
+            {% endif %}
+          </article>
+          {% else %}<div class="empty">Aucune réservation future plus éloignée.</div>{% endfor %}
+        </div>
+      </section>
+
+      <section class="reservation-group history">
+        <div class="section-head">
+          <div><h2>Anciennes réservations</h2><p>Historique séparé des réservations futures.</p></div>
+          <span class="count">{{ past_bookings|length }}</span>
+        </div>
+        <div class="list">
+          {% for b in past_bookings %}
+          <article id="booking-all-{{ b.id }}" class="booking {{ b.status }}">
+            <div class="reservation-date">{{ b.start_dt[:10] }} · {{ b.start_dt[11:16] }}</div>
+            <div class="booking-top">
+              <div><h3>{{ b.pseudo }}</h3><div class="sub">{{ b.email }}<br>{{ b.duration_minutes }} min</div></div>
+              <div class="price">{{ b.price }} €</div>
+            </div>
+            <span class="status {{ b.status }}">{% if b.status=='completed' %}Réalisée{% elif b.status=='confirmed' %}Confirmée{% elif b.status=='cancelled' %}Refusée{% else %}En attente{% endif %}</span>
+            <details class="history-details">
+              <summary>Voir les pratiques et notes</summary>
+              <div class="notes-box">
+                <form method="post" action="{{ url_for('admin_booking_notes', booking_id=b.id) }}">
+                  <label>Pratiques souhaitées<textarea name="practices">{{ b.practices or '' }}</textarea></label>
+                  <label>Notes privées<textarea name="private_notes">{{ b.private_notes or '' }}</textarea></label>
+                  <button class="btn" type="submit">Enregistrer les notes</button>
+                </form>
+              </div>
+            </details>
+            <div class="actions">
+              <form method="post"
+                    action="{{ url_for('delete_booking', booking_id=b.id) }}"
+                    onsubmit="return confirm('Supprimer définitivement cette ancienne réservation ? Cette action est irréversible.');">
+                <button class="btn danger" type="submit">🗑️ Supprimer cette réservation</button>
+              </form>
+            </div>
+          </article>
+          {% else %}<div class="empty">Aucune ancienne réservation.</div>{% endfor %}
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section id="planning" class="screen">
+    <div class="hero"><p class="eyebrow">Planning</p><h1>Calendrier</h1><p>Consulte, bloque un créneau, une journée ou plusieurs jours.</p></div>
+    <section class="section">
+      <div class="calendar-controls"><button class="btn" id="prevMonth">‹</button><h3 id="calendarTitle"></h3><button class="btn" id="nextMonth">›</button></div>
+      <div id="calendar" class="calendar"></div>
+    </section>
+    <div class="forms">
+      <section class="form-card" style="border-color:rgba(180,148,230,.35)">
+        <h3>➕ Créer un rendez-vous</h3>
+        <form class="manual-form" method="post" action="{{ url_for('admin_create_booking') }}">
+          <div class="manual-grid">
+            <label><span>Pseudo</span><input name="pseudo" required></label>
+            <label><span>E-mail</span><input type="email" name="email"></label>
+            <label><span>Date et heure libres</span><input type="datetime-local" name="start_dt" required></label>
+            <label><span>Durée libre (minutes)</span><input type="number" name="duration_minutes" min="1" placeholder="15" required></label>
+            <label><span>Prix libre (€)</span><input type="number" name="price" min="0" placeholder="80" required></label>
+            <label><span>Acompte (€)</span><input type="number" name="deposit" min="0" value="0"></label>
+            <label><span>Statut</span><select name="status"><option value="confirmed">Confirmé</option><option value="pending">En attente</option><option value="completed">Réalisé</option></select></label>
+            <label><span>Paiement</span><input name="payment_method" placeholder="Espèces, PayPal..."></label>
+          </div>
+          <label><span>Pratiques souhaitées</span><textarea name="practices"></textarea></label>
+          <label><span>Notes privées</span><textarea name="private_notes"></textarea></label>
+          <label style="display:flex;gap:9px;align-items:center"><input style="width:auto" type="checkbox" name="send_confirmation" value="1"> Envoyer un e-mail de confirmation</label>
+          <button class="btn primary" type="submit">Créer le rendez-vous</button>
+        </form>
+      </section>
+      <form class="form-card" method="post" action="{{ url_for('admin_block') }}"><h3>Bloquer un créneau</h3><label>Début<input type="datetime-local" name="start_dt" required></label><label>Fin<input type="datetime-local" name="end_dt" required></label><label>Note<input name="note" placeholder="Indisponible..."></label><button class="btn primary full">Bloquer</button></form>
+      <form class="form-card" method="post" action="{{ url_for('admin_block_day') }}"><h3>Bloquer une journée</h3><label>Date<input type="date" name="date" required></label><label>Note<input name="note" placeholder="Journée indisponible"></label><button class="btn primary full">Bloquer la journée</button></form>
+      <form class="form-card" method="post" action="{{ url_for('admin_block_range') }}"><h3>Vacances / plusieurs jours</h3><label>Du<input type="date" name="start_date" required></label><label>Au<input type="date" name="end_date" required></label><label>Note<input name="note" placeholder="Vacances, déplacement..."></label><button class="btn primary full">Bloquer la période</button></form>
+    </div>
+    <section class="section" style="margin-top:16px"><div class="section-head"><h2>Indisponibilités</h2><span class="count">{{ blocks|length }}</span></div><div class="list">{% for x in blocks %}<article class="booking"><h3>{{ x.start_dt.replace('T',' ') }}</h3><div class="sub">Jusqu’au {{ x.end_dt.replace('T',' ') }}<br>{{ x.note or 'Indisponible' }}</div><form method="post" action="{{ url_for('delete_block', block_id=x.id) }}" style="margin-top:10px"><button class="btn danger">Supprimer</button></form></article>{% else %}<div class="empty">Aucune indisponibilité.</div>{% endfor %}</div></section>
+  </section>
+
+  <section id="clients" class="screen">
+    <div class="hero"><p class="eyebrow">CRM</p><h1>Clients</h1><p>Historique, fidélité et montant dépensé.</p></div>
+    <div class="search"><input id="clientSearch" placeholder="Rechercher un client"><a class="btn" href="{{ url_for('admin_clients') }}">Vue complète</a></div>
+    <div id="clientsList" class="list clients-grid">
+      {% for c in clients_preview %}<a class="client" data-search="{{ (c.pseudo ~ ' ' ~ c.email)|lower }}" href="{{ url_for('admin_client_detail', email=c.email) }}"><div><h3>{{ c.pseudo }}</h3><div class="sub">{{ c.email }} · {{ c.confirmed_bookings }} séance(s)</div></div><div class="amount">{{ c.total_spent }} €</div></a>{% else %}<div class="empty">Aucun client.</div>{% endfor %}
+    </div>
+  </section>
+
+  <section id="business" class="screen">
+    <div class="hero"><p class="eyebrow">Business</p><h1>Revenus</h1><p>Tes chiffres importants, sans tableau compliqué.</p></div>
+    <div class="business-grid">
+      <div class="business-card"><strong>{{ dashboard.today_revenue }} €</strong><span>Aujourd’hui</span></div>
+      <div class="business-card"><strong>{{ dashboard.week_revenue }} €</strong><span>7 derniers jours</span></div>
+      <div class="business-card"><strong>{{ dashboard.month_revenue }} €</strong><span>Ce mois</span></div>
+      <div class="business-card"><strong>{{ dashboard.year_revenue }} €</strong><span>Cette année</span></div>
+      <div class="business-card wide"><strong>{{ dashboard.total_revenue }} €</strong><span>Total confirmé depuis le début</span></div>
+      <div class="business-card"><strong>{{ dashboard.average_booking|round|int }} €</strong><span>Panier moyen</span></div>
+      <div class="business-card"><strong>{{ dashboard.confirmation_rate }} %</strong><span>Taux de confirmation</span></div>
+      <div class="business-card"><strong>{{ dashboard.confirmed_total }}</strong><span>Séances confirmées</span></div>
+      <div class="business-card"><strong>{{ counts.confirmed }}</strong><span>Réservations confirmées</span></div>
+    </div>
+
+    <div class="assistant-card" style="margin-top:16px">
+      <h3>Assistant Business ✦</h3>
+      <p>Pose une question sur tes revenus, tes rendez-vous ou tes clients.</p>
+      <div class="assistant-row">
+        <input id="assistantQuestion" placeholder="Ex. Combien ai-je gagné ce mois-ci ?">
+        <button class="btn primary" id="assistantSend" type="button">Demander</button>
+      </div>
+      <div class="assistant-answer" id="assistantAnswer"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="screen">
+    <div class="hero"><p class="eyebrow">Réglages</p><h1>Plus</h1><p>Accès rapides et état de l’application.</p></div>
+    <div class="settings">
+      <div class="setting"><div><strong>Notifications</strong><span id="pushText">Vérification…</span></div><button class="btn" id="settingsPush">Gérer</button></div>
+      <a class="setting" href="{{ url_for('admin_reviews') }}"><div><strong>Avis</strong><span>{{ dashboard.reviews_pending }} en attente</span></div><b>›</b></a>
+      <a class="setting" href="{{ url_for('index') }}"><div><strong>Voir le site public</strong><span>Ouvrir la page de réservation</span></div><b>›</b></a>
+      <a class="setting" href="{{ url_for('logout') }}"><div><strong style="color:var(--red)">Déconnexion</strong><span>Fermer la session admin</span></div><b>›</b></a>
+    </div>
+  </section>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-target="home"><b>⌂</b>Accueil{% if dashboard.action_count %}<span class="badge">{{ dashboard.action_count }}</span>{% endif %}</button>
+  <button class="nav-btn" data-target="planning"><b>▦</b>Planning</button>
+  <button class="nav-btn" data-target="clients"><b>♟</b>Clients</button>
+  <button class="nav-btn" data-target="business"><b>€</b>Business</button>
+  <button class="nav-btn" data-target="settings"><b>•••</b>Plus</button>
+</nav>
+
+<script>
+  const screens=[...document.querySelectorAll('.screen')], navButtons=[...document.querySelectorAll('.nav-btn')];
+  function openTab(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));navButtons.forEach(b=>b.classList.toggle('active',b.dataset.target===id));history.replaceState(null,'','#'+id);window.scrollTo(0,0)}
+  navButtons.forEach(b=>b.addEventListener('click',()=>openTab(b.dataset.target)));openTab(location.hash.slice(1)||'home');
+
+  const bookingEvents={{ calendar_bookings|tojson }}, blockEvents={{ calendar_blocks|tojson }};let shownMonth=new Date();shownMonth.setDate(1);const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],weekdays=['L','M','M','J','V','S','D'];
+  function key(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  function renderCalendar(){const root=document.getElementById('calendar');root.innerHTML='';document.getElementById('calendarTitle').textContent=`${months[shownMonth.getMonth()]} ${shownMonth.getFullYear()}`;weekdays.forEach(w=>{const e=document.createElement('div');e.className='weekday';e.textContent=w;root.appendChild(e)});const first=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),1),offset=(first.getDay()+6)%7,start=new Date(first);start.setDate(first.getDate()-offset);for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),cell=document.createElement('div');cell.className='day';if(d.getMonth()!==shownMonth.getMonth())cell.classList.add('outside');if(k===key(new Date()))cell.classList.add('today');const n=document.createElement('div');n.className='day-num';n.textContent=d.getDate();cell.appendChild(n);bookingEvents.filter(e=>e.start.slice(0,10)===k).forEach(e=>{const x=document.createElement('button');x.className=`event ${e.status}`;x.textContent=`${e.start.slice(11,16)} ${e.title}`;x.onclick=()=>{openTab('home');setTimeout(()=>{const target=document.getElementById(`booking-all-${e.id}`)||document.getElementById(`booking-${e.id}`);if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.classList.add('target-flash');setTimeout(()=>target.classList.remove('target-flash'),1800)}},180)};cell.appendChild(x)});blockEvents.filter(e=>e.start.slice(0,10)===k).forEach(e=>{const x=document.createElement('div');x.className='event block';x.textContent=e.title;cell.appendChild(x)});root.appendChild(cell)}}
+  document.getElementById('prevMonth').onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()-1);renderCalendar()};document.getElementById('nextMonth').onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()+1);renderCalendar()};renderCalendar();
+
+  document.getElementById('clientSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('#clientsList .client').forEach(c=>c.style.display=c.dataset.search.includes(q)?'grid':'none')});
+
+  function b64(s){const p='='.repeat((4-s.length%4)%4),b=(s+p).replace(/-/g,'+').replace(/_/g,'/'),r=atob(b);return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))}
+  async function syncPush(){const dot=document.getElementById('pushDot'),text=document.getElementById('pushText');if(!('serviceWorker'in navigator)||!('PushManager'in window)){text.textContent='Disponible uniquement depuis l’app installée';return false}try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();const on=Notification.permission==='granted'&&!!sub;dot.classList.toggle('on',on);text.textContent=on?'Activées':'Désactivées';if(on){await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});navigator.serviceWorker.controller?.postMessage({type:'CLEAR_BADGE'})}return on}catch(e){text.textContent='État indisponible';return false}}
+  async function enablePush(){if(!('serviceWorker'in navigator)||!('PushManager'in window)){alert("Ouvre Admin Lana depuis l’icône installée sur l’écran d’accueil pour utiliser les notifications.");return}const permission=await Notification.requestPermission();if(permission!=='granted')return;const reg=await navigator.serviceWorker.ready,keyData=await fetch('/api/push/public-key').then(r=>r.json());let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(keyData.publicKey)});await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});await syncPush()}
+  document.getElementById('pushButton').onclick=enablePush;document.getElementById('settingsPush').onclick=enablePush;
+  document.getElementById("pendingMetric")?.addEventListener("click",()=>{
+    document.getElementById("pendingSection")?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  document.getElementById("todayMetric")?.addEventListener("click",()=>{
+    document.getElementById("todaySection")?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  document.getElementById("moneyMetric")?.addEventListener("click",()=>{
+    document.querySelector('.nav-btn[data-target="business"]')?.click();
+  });
+
+  document.getElementById("pendingJump")?.addEventListener("click",()=>{
+    document.querySelector('.nav-btn[data-target="home"]')?.click();
+    setTimeout(()=>document.querySelector(".booking.pending")?.scrollIntoView({behavior:"smooth",block:"center"}),180);
+  });
+
+  document.querySelectorAll("[data-open]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      document.querySelector(`.nav-btn[data-target="${button.dataset.open}"]`)?.click();
+    });
+  });
+
+  const assistantSend=document.getElementById("assistantSend");
+  assistantSend?.addEventListener("click",async()=>{
+    const input=document.getElementById("assistantQuestion");
+    const answer=document.getElementById("assistantAnswer");
+    const question=input.value.trim();
+    if(!question)return;
+    assistantSend.disabled=true;
+    assistantSend.textContent="...";
+    try{
+      const response=await fetch("/admin/assistant",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({question})
+      });
+      const data=await response.json();
+      answer.textContent=data.answer;
+      answer.classList.add("show");
+    }catch(error){
+      answer.textContent="Impossible de répondre pour le moment.";
+      answer.classList.add("show");
+    }finally{
+      assistantSend.disabled=false;
+      assistantSend.textContent="Demander";
+    }
+  });
+
+  document.getElementById("assistantQuestion")?.addEventListener("keydown",(event)=>{
+    if(event.key==="Enter"){
+      event.preventDefault();
+      assistantSend?.click();
+    }
+  });
+
+  const focusBooking={{ focus_booking|tojson }};
+  if(focusBooking){
+    const target=document.getElementById(`booking-all-${focusBooking}`)||document.getElementById(`booking-${focusBooking}`);
+    if(target){
+      document.querySelector('.nav-btn[data-screen="home"]')?.click();
+      setTimeout(()=>target.scrollIntoView({behavior:"smooth",block:"center"}),250);
+    }
+  }
+
+  async function syncActionBadge(){
+    const count={{ dashboard.action_count|int }};
+    try{
+      if(count>0 && "setAppBadge" in navigator){
+        await navigator.setAppBadge(count);
+      }else if("clearAppBadge" in navigator){
+        await navigator.clearAppBadge();
+      }
+
+      const registration=await navigator.serviceWorker.ready;
+      registration.active?.postMessage(
+        count>0
+          ? {type:"SET_BADGE",count}
+          : {type:"CLEAR_BADGE"}
+      );
+    }catch(error){
+      console.warn("Badge :",error);
+    }
+  }
+
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.register('/admin-sw.js',{scope:'/'})
+      .then(async()=>{await syncPush();await syncActionBadge();})
+      .catch(console.warn);
+  }
+</script>
+</body>
+</html>
