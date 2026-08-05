@@ -1,10 +1,10 @@
-const CACHE_NAME = "admin-lana-v4";
+const CACHE_NAME = "admin-lana-v5";
 
 const APP_SHELL = [
   "/admin",
   "/static/style.css",
   "/static/admin-icon-192.png",
-  "/static/admin-icon-512.png"
+  "/static/admin-icon-512.PNG"
 ];
 
 self.addEventListener("install", (event) => {
