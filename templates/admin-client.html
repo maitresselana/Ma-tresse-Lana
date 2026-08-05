@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>{{ client.pseudo }} — Client</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top right,rgba(111,34,58,.22),transparent 30%),#09090c;color:#f7f2ea;font-family:Arial,Helvetica,sans-serif}
+    .shell{width:min(760px,100%);margin:auto;padding:22px 14px 70px}
+    .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .back{display:inline-flex;padding:10px 13px;border:1px solid #39313b;border-radius:999px;color:#efd49a;text-decoration:none}
+    h1{margin:18px 0 5px;font:500 clamp(2.4rem,11vw,4.4rem) Georgia,serif;color:#efd49a}
+    .muted{color:#aaa1a7;line-height:1.5}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0}
+    .stat{padding:14px;border:1px solid #312d35;border-radius:17px;background:#15151a}
+    .stat strong{display:block;font:500 1.35rem Georgia,serif;color:#efd49a}.stat span{font-size:.72rem;color:#aaa1a7}
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin:24px 0 11px}.section-title h2{margin:0;font:500 1.65rem Georgia,serif}
+    .list{display:grid;gap:11px}
+    .booking{padding:16px;border:1px solid #342f36;border-radius:19px;background:#111015;scroll-margin-top:18px}
+    .booking.focus{border-color:#efd49a;box-shadow:0 0 0 3px rgba(237,212,154,.11)}
+    .booking-head{display:flex;justify-content:space-between;gap:12px}.booking h3{margin:0 0 5px;font:500 1.35rem Georgia,serif}.price{color:#efd49a;font-weight:900}
+    .status{display:inline-flex;margin-top:9px;padding:5px 9px;border:1px solid #4a424c;border-radius:999px;font-size:.72rem;font-weight:900}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+    .btn{display:block;padding:11px 12px;border:1px solid rgba(237,212,154,.4);border-radius:999px;background:transparent;color:#efd49a;text-align:center;text-decoration:none;font-weight:900}
+    .btn.danger{border-color:rgba(239,159,175,.45);color:#f2a3b2}
+    .danger-zone{margin-top:25px;padding:16px;border:1px solid rgba(239,159,175,.38);border-radius:18px;background:rgba(90,24,42,.12)}
+    .danger-zone h2{margin:0 0 6px;color:#f2a3b2;font-size:1.15rem}.danger-zone p{margin:0 0 12px;color:#bdaab0;line-height:1.5}
+    .danger-zone button{width:100%;padding:12px;border:1px solid rgba(239,159,175,.48);border-radius:999px;background:transparent;color:#f2a3b2;font-weight:900}
+    @media(max-width:520px){.summary{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="top">
+    <a class="back" href="{{ url_for('admin') }}">← Réservations</a>
+    <a class="back" href="{{ url_for('admin_clients') }}">Clients</a>
+  </div>
+
+  {% with messages=get_flashed_messages() %}
+    {% for m in messages %}<div class="stat" style="margin-top:14px;color:#efd49a">{{ m }}</div>{% endfor %}
+  {% endwith %}
+
+  <h1>{{ client.pseudo }}</h1>
+  <div class="muted">{{ client.email }}{% if client.twitter %} · {{ client.twitter }}{% endif %}</div>
+
+  <section class="summary">
+    <div class="stat"><strong>{{ client.total_bookings }}</strong><span>réservations</span></div>
+    <div class="stat"><strong>{{ client.confirmed_bookings }}</strong><span>confirmées</span></div>
+    <div class="stat"><strong>{{ client.total_spent }} €</strong><span>total</span></div>
+  </section>
+
+  <div class="section-title"><h2>Rendez-vous</h2><span class="muted">{{ bookings|length }}</span></div>
+  <section class="list">
+    {% for b in bookings %}
+    <article id="booking-{{ b.id }}" class="booking {% if request.args.get('booking')|int == b.id %}focus{% endif %}">
+      <div class="booking-head">
+        <div>
+          <h3>{{ b.start_dt[:10] }} · {{ b.start_dt[11:16] }}</h3>
+          <div class="muted">{{ b.duration_minutes }} min · acompte {{ b.deposit }} €<br>{{ b.payment_method or 'Paiement non précisé' }}</div>
+        </div>
+        <div class="price">{{ b.price }} €</div>
+      </div>
+      <span class="status">
+        {% if b.status=='completed' %}Réalisé
+        {% elif b.status=='confirmed' %}Confirmé
+        {% elif b.status=='cancelled' %}Annulé
+        {% else %}En attente{% endif %}
+      </span>
+
+      <div class="actions">
+        <a class="btn" href="{{ url_for('admin_booking_edit', booking_id=b.id) }}">✏️ Modifier</a>
+        <a class="btn" href="{{ url_for('admin_booking_notes_page', booking_id=b.id) }}">📝 Notes</a>
+        {% if b.status == 'confirmed' %}
+        <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='complete') }}" style="margin:0">
+          <button class="btn" type="submit" style="width:100%">✓ Réalisé</button>
+        </form>
+        {% endif %}
+        <form method="post" action="{{ url_for('delete_booking', booking_id=b.id) }}" style="margin:0" onsubmit="return confirm('Supprimer définitivement ce rendez-vous ?');">
+          <button class="btn danger" type="submit" style="width:100%">🗑️ Supprimer</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="danger-zone">
+    <h2>Supprimer la fiche client</h2>
+    <p>Supprime le client et tout son historique. Cette action est irréversible.</p>
+    <form method="post" action="{{ url_for('admin_delete_client') }}" onsubmit="return confirm('Supprimer définitivement cette fiche client et tout son historique ?');">
+      <input type="hidden" name="email" value="{{ client.email }}">
+      <button type="submit">Supprimer définitivement</button>
+    </form>
+  </section>
+</main>
+
+{% if request.args.get('booking') %}
+<script>
+  document.getElementById("booking-{{ request.args.get('booking') }}")?.scrollIntoView({behavior:"smooth",block:"center"});
+</script>
+{% endif %}
+</body>
+</html>
