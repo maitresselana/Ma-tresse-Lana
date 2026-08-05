@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#09090c">
+  <title>{{ client.pseudo }} — Fiche client</title>
+  <style>
+    :root{
+      --bg:#09090c;
+      --panel:#141318;
+      --panel2:#0f0e13;
+      --line:#38313a;
+      --gold:#efd49a;
+      --muted:#aaa1a7;
+      --text:#f7f2ea;
+      --red:#f2a3b2;
+      --green:#9fd2ad;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+    body{background:radial-gradient(circle at 92% 0,rgba(111,34,58,.22),transparent 30%),linear-gradient(180deg,#09090c,#0d0b10)}
+    a{text-decoration:none;color:inherit}
+    button,input,textarea{font:inherit}
+
+    .page{
+      width:min(760px,100%);
+      margin:0 auto;
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        14px
+        calc(78px + env(safe-area-inset-bottom));
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:calc(-14px - env(safe-area-inset-top)) -14px 0;
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        14px
+        12px;
+      border-bottom:1px solid rgba(239,212,154,.15);
+      background:rgba(9,9,12,.92);
+      backdrop-filter:blur(18px);
+    }
+
+    .nav-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:10px 14px;
+      border:1px solid rgba(239,212,154,.38);
+      border-radius:999px;
+      color:var(--gold);
+      background:#111015;
+      font-weight:850;
+      font-size:.88rem;
+      white-space:nowrap;
+    }
+
+    .identity{padding:22px 3px 8px}
+    .label{color:#c8a85f;font-size:.69rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+    h1{margin:7px 0 8px;font:500 clamp(2.6rem,13vw,4.8rem) Georgia,serif;line-height:.95;color:var(--gold)}
+    .identity-lines{display:grid;gap:5px;color:var(--muted);font-size:.92rem;line-height:1.45}
+    .identity-lines strong{color:#eee5da}
+
+    .flash{
+      margin-top:14px;
+      padding:13px 15px;
+      border:1px solid rgba(239,212,154,.35);
+      border-radius:15px;
+      background:#171318;
+      color:var(--gold);
+    }
+
+    .summary{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:9px;
+      margin:18px 0 24px;
+    }
+    .stat{
+      min-width:0;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:17px;
+      background:var(--panel);
+    }
+    .stat strong{
+      display:block;
+      overflow-wrap:anywhere;
+      font:500 1.35rem Georgia,serif;
+      color:var(--gold);
+    }
+    .stat span{display:block;margin-top:4px;color:var(--muted);font-size:.72rem}
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 2px 11px;
+    }
+    .section-title h2{margin:0;font:500 1.65rem Georgia,serif}
+    .count{color:var(--muted)}
+
+    .list{display:grid;gap:12px}
+    .booking{
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:var(--panel2);
+      scroll-margin-top:90px;
+    }
+    .booking.focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(239,212,154,.11)}
+    .booking-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .booking h3{margin:0 0 6px;font:500 1.35rem Georgia,serif}
+    .price{color:var(--gold);font-weight:900;white-space:nowrap}
+    .muted{color:var(--muted);line-height:1.5;font-size:.88rem}
+    .status{
+      display:inline-flex;
+      margin-top:10px;
+      padding:5px 9px;
+      border:1px solid #4a424c;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:900;
+    }
+    .status.completed{color:var(--green);border-color:rgba(159,210,173,.45)}
+    .status.cancelled{color:var(--red);border-color:rgba(242,163,178,.45)}
+    .status.confirmed{color:var(--gold);border-color:rgba(239,212,154,.45)}
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:13px;
+    }
+    .action{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:10px 12px;
+      border:1px solid rgba(239,212,154,.42);
+      border-radius:999px;
+      background:transparent;
+      color:var(--gold);
+      text-align:center;
+      font-weight:900;
+    }
+    .action.danger{border-color:rgba(242,163,178,.45);color:var(--red)}
+    form{margin:0}
+
+    .danger-zone{
+      margin-top:25px;
+      padding:16px;
+      border:1px solid rgba(242,163,178,.38);
+      border-radius:18px;
+      background:rgba(90,24,42,.12);
+    }
+    .danger-zone h2{margin:0 0 6px;color:var(--red);font-size:1.15rem}
+    .danger-zone p{margin:0 0 12px;color:#bdaab0;line-height:1.5}
+    .danger-zone button{
+      width:100%;
+      padding:12px;
+      border:1px solid rgba(242,163,178,.48);
+      border-radius:999px;
+      background:transparent;
+      color:var(--red);
+      font-weight:900;
+    }
+
+    @media(max-width:520px){
+      .summary{grid-template-columns:1fr 1fr}
+      .summary .stat:last-child{grid-column:1/-1}
+      .nav-btn{padding:9px 12px;font-size:.82rem}
+      .actions{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<main class="page">
+  <nav class="topbar">
+    <a class="nav-btn" href="{{ url_for('admin') }}">← Réservations</a>
+    <a class="nav-btn" href="{{ url_for('admin_clients') }}">Clients</a>
+  </nav>
+
+  {% with messages=get_flashed_messages() %}
+    {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+  {% endwith %}
+
+  <section class="identity">
+    <div class="label">Fiche client</div>
+    <h1>{{ client.pseudo }}</h1>
+    <div class="identity-lines">
+      <div><strong>Pseudo :</strong> {{ client.pseudo }}</div>
+      <div><strong>Âge :</strong> {{ bookings[0].age }} ans</div>
+      <div><strong>E-mail :</strong> {{ client.email }}</div>
+      {% if client.twitter %}<div><strong>Twitter / X :</strong> {{ client.twitter }}</div>{% endif %}
+      {% if bookings[0].message %}<div><strong>Message initial :</strong> {{ bookings[0].message }}</div>{% endif %}
+    </div>
+  </section>
+
+  <section class="summary">
+    <div class="stat"><strong>{{ client.total_bookings }}</strong><span>réservations</span></div>
+    <div class="stat"><strong>{{ client.confirmed_bookings }}</strong><span>confirmées</span></div>
+    <div class="stat"><strong>{{ client.total_spent }} €</strong><span>total confirmé</span></div>
+  </section>
+
+  <div class="section-title">
+    <h2>Rendez-vous</h2>
+    <span class="count">{{ bookings|length }}</span>
+  </div>
+
+  <section class="list">
+    {% for b in bookings %}
+    <article id="booking-{{ b.id }}" class="booking {% if request.args.get('booking')|int == b.id %}focus{% endif %}">
+      <div class="booking-head">
+        <div>
+          <h3>{{ b.start_dt[:10] }} · {{ b.start_dt[11:16] }}</h3>
+          <div class="muted">
+            {{ b.duration_minutes }} min · acompte {{ b.deposit }} €<br>
+            {{ b.payment_method or 'Paiement non précisé' }}
+          </div>
+        </div>
+        <div class="price">{{ b.price }} €</div>
+      </div>
+
+      <span class="status {{ b.status }}">
+        {% if b.status=='completed' %}Réalisé
+        {% elif b.status=='confirmed' %}Confirmé
+        {% elif b.status=='cancelled' %}Annulé
+        {% else %}En attente{% endif %}
+      </span>
+
+      <div class="actions">
+        <a class="action" href="{{ url_for('admin_booking_edit', booking_id=b.id) }}">✏️ Modifier</a>
+        <a class="action" href="{{ url_for('admin_booking_notes_page', booking_id=b.id) }}">📝 Notes</a>
+
+        {% if b.status == 'confirmed' %}
+        <form method="post" action="{{ url_for('admin_booking_action', booking_id=b.id, action='complete') }}">
+          <button class="action" type="submit" style="width:100%">✓ Réalisé</button>
+        </form>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('delete_booking', booking_id=b.id) }}"
+              onsubmit="return confirm('Supprimer définitivement ce rendez-vous ?');">
+          <button class="action danger" type="submit" style="width:100%">🗑️ Supprimer</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="danger-zone">
+    <h2>Supprimer la fiche client</h2>
+    <p>Supprime le client et tout son historique. Cette action est irréversible.</p>
+    <form method="post" action="{{ url_for('admin_delete_client') }}"
+          onsubmit="return confirm('Supprimer définitivement cette fiche client et tout son historique ?');">
+      <input type="hidden" name="email" value="{{ client.email }}">
+      <button type="submit">Supprimer définitivement</button>
+    </form>
+  </section>
+</main>
+
+{% if request.args.get('booking') %}
+<script>
+  document.getElementById("booking-{{ request.args.get('booking') }}")
+    ?.scrollIntoView({behavior:"smooth",block:"center"});
+</script>
+{% endif %}
+</body>
+</html>
