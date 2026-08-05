@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Modifier le rendez-vous</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#09090c;color:#f7f2ea;font-family:Arial,sans-serif}
+    .shell{width:min(620px,100%);margin:auto;padding:22px 14px 60px}
+    .back{display:inline-flex;padding:10px 13px;border:1px solid #39313b;border-radius:999px;color:#efd49a;text-decoration:none}
+    h1{margin:22px 0 6px;font:500 clamp(2.3rem,10vw,4rem) Georgia,serif;color:#efd49a}.muted{color:#aaa1a7}
+    .card{margin-top:18px;padding:18px;border:1px solid #342f36;border-radius:22px;background:#131217}
+    form{display:grid;gap:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{font-size:.8rem;color:#aaa1a7}label span{display:block;margin-bottom:6px;color:#f7f2ea;font-weight:900}
+    input,select{width:100%;padding:13px;border:1px solid #39343c;border-radius:13px;background:#0b0b0f;color:#fff;font-size:16px}
+    button{padding:14px;border:0;border-radius:999px;background:linear-gradient(135deg,#efd49a,#bd9450);color:#181208;font-weight:900;font-size:1rem}
+    @media(max-width:520px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <a class="back" href="{{ url_for('admin_client_detail', email=booking.email, booking=booking.id) }}">← Retour</a>
+  <h1>Modifier</h1>
+  <div class="muted">{{ booking.pseudo }} · rendez-vous #{{ booking.id }}</div>
+
+  {% with messages=get_flashed_messages() %}
+    {% for m in messages %}<div class="card" style="color:#efd49a">{{ m }}</div>{% endfor %}
+  {% endwith %}
+
+  <section class="card">
+    <form method="post">
+      <div class="grid">
+        <label><span>Date et heure</span><input type="datetime-local" name="start_dt" value="{{ booking.start_dt }}" required></label>
+        <label><span>Durée en minutes</span><input type="number" name="duration_minutes" min="1" value="{{ booking.duration_minutes }}" required></label>
+        <label><span>Prix (€)</span><input type="number" name="price" min="0" value="{{ booking.price }}" required></label>
+        <label><span>Acompte (€)</span><input type="number" name="deposit" min="0" value="{{ booking.deposit }}" required></label>
+        <label><span>Mode de paiement</span><input name="payment_method" value="{{ booking.payment_method or '' }}"></label>
+        <label><span>Statut</span>
+          <select name="status">
+            <option value="pending" {% if booking.status=='pending' %}selected{% endif %}>En attente</option>
+            <option value="confirmed" {% if booking.status=='confirmed' %}selected{% endif %}>Confirmé</option>
+            <option value="completed" {% if booking.status=='completed' %}selected{% endif %}>Réalisé</option>
+            <option value="cancelled" {% if booking.status=='cancelled' %}selected{% endif %}>Annulé</option>
+          </select>
+        </label>
+      </div>
+      <button type="submit">Enregistrer les modifications</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>
